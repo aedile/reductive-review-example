@@ -1,8 +1,8 @@
-# Magic Link Login — Design Spec (v0.5)
+# Magic Link Login — Design Spec (v0.6)
 
 > Fictional teaching artifact. This spec began intentionally insecure (v0.1) and was
-> hardened across five recorded review rounds. Even at v0.5 it is a worked example,
-> not a production design. **Do not implement.**
+> hardened across six recorded review rounds to convergence. Even at v0.6 it is a
+> worked example, not a production design. **Do not implement.**
 
 ## §1 Goal and scope
 
@@ -120,9 +120,12 @@ throttle) with **async** workers, decoupling request latency from the provider a
 preventing unthrottled fan-out under burst. Sends get bounded retry with backoff; hard
 bounces vs transient failures are classified; exhausted sends are dead-lettered into §8.
 The confirmation page sets a latency expectation ("usually within a minute; check
-spam/promotions"), offers a **resend** gated to §2.1 (resend mints an additional token
-under the §2.2 cap; it never invalidates a prior link), and a "wrong address? re-enter
-it" affordance. A send failure surfaces a neutral "we couldn't send your link right now."
+spam/promotions"), tells the user they **may receive more than one email** if they
+request again and that **any of the links works** until it expires (so they don't hunt
+for "the latest" one), offers a **resend** gated to §2.1 (resend mints an additional
+token under the §2.2 cap; it never invalidates a prior link), and a "wrong address?
+re-enter it" affordance. A send failure surfaces a neutral "we couldn't send your link
+right now."
 
 ### §5.1 Email content, trust signals, and accessibility
 
@@ -148,8 +151,11 @@ lands on the page they originally tried to reach, or a default home if none.
 ### §6.1 Error, empty, and edge states; accessibility
 
 Defined, account-existence-neutral states, each with plain-language copy and a single
-"send me a new link" action: **expired**, **already used** (consumed or
-revoked-by-recovery), **malformed/unrecognized link**, **rate-limited**, **wrong-account**. The "rate-limited" state
+"send me a new link" action: **expired**, **already used** (a token *this user consumed*), **revoked by recovery** (a
+distinct state with its own neutral copy — "for your security, links from before your
+recent account recovery no longer work — request a fresh one" — never labelled "used,"
+which for a recovery-completing user would falsely read as "someone used my link"),
+**malformed/unrecognized link**, **rate-limited**, **wrong-account**. The "rate-limited" state
 renders **only** as a non-enumerating hint ("Still waiting? Links can take a minute;
 check spam before re-requesting") — never as a throttle confirmation, so it cannot
 re-open the §4.0 enumeration channel. This set is the response §3.2 refers to. Pages meet
@@ -189,11 +195,15 @@ email doesn't count; shared/forwarded-inbox accounts fall to the support-mediate
 **or** a support-mediated identity check requiring defined, replay-resistant identity
 evidence. Recovery is inside the threat model: recovery initiation and verification are
 rate-limited and locked out mirroring §2.1; support-mediated recovery is logged/alerted
-(§8); and a **successful recovery rotates the session, terminates the account's other
-active sessions, and invalidates all live login tokens** — the last via the §3.1
-account-scoped index, moving every `issued` row for the account to `revoked` in one
-account-scoped operation, so no attacker-minted link survives recovery. The path is held
-to the primary-path bar, so §7.1's claims hold end-to-end.
+(§8); and a successful recovery, **in this order**, (1) **revokes all the account's live login
+tokens** — via the §3.1 account-scoped index, enumerating and writing **on the primary**
+and moving every `issued` row to `revoked`, each row's transition contending with consume
+on that one row — then (2) **terminates the account's other active sessions and rotates
+the session.** The order matters: revoking first fences any further consume, and the
+subsequent session sweep then also kills any session a just-in-time consume created in the
+gap, so **no attacker-minted link or session survives recovery** (revoking *after* the
+sweep would leave that gap open). The path is held to the primary-path bar, so §7.1's
+claims hold end-to-end.
 
 ## §8 Observability and retention
 
@@ -204,15 +214,16 @@ alert thresholds — how an abuse spike becomes visible), sent, send-failures, c
 confirmations, logins, expired-link hits, replay attempts, and recovery attempts.
 Leading indicators for the delivery path: a **send-queue depth gauge** with a
 high-water alert and a **dead-letter-rate** counter, so saturation is visible *before*
-sends start failing rather than after. A **node-clock-offset gauge** alerts when any
-app/datastore node drifts toward the §3.3 ≤ 5 s NTP bound, so a drift that would break
-the `now() ≥ expires_at` decision is caught before it affects tokens.
+sends start failing rather than after. A **node-clock-offset gauge** warns at **≥ 3 s** of
+measured offset on any app/datastore node — strictly below the §3.3 ≤ 5 s NTP bound, so a
+drift that would break the `now() ≥ expires_at` decision is caught with headroom before
+it affects tokens.
 
 ### §8.2 Logging and retention
 
 Raw tokens are **never** logged; only the hash or an opaque request id appears; email
 addresses in logs are minimised. Token rows are reaped on a stated TTL (consumed: 7
-days; expired: 24 h), but a minimal **tombstone** (hash + state + **`terminal_at`** — the
+days; revoked: 7 days; expired: 24 h), but a minimal **tombstone** (hash + state + **`terminal_at`** — the
 time the token entered its terminal state, defined for consumed, expired, *and* revoked)
 is retained past row-reap for the replay-observation window so any replay stays
 classifiable. Reaping never runs before `expires_at` + the replay-observation window.
@@ -242,3 +253,10 @@ classifiable. Reaping never runs before `expires_at` + the replay-observation wi
   off-path coalescing key (§2.2), linearizable consume CAS (§3.2), legacy-enrolment trust
   boundary (§7.2), node-clock-offset monitoring (§8.1), and the multi-email expectation
   (§2.2/§5.0).
+- **v0.6** — closed the two round-005 findings, both introduced by the v0.5 edits:
+  ordered recovery to **revoke tokens before terminating sessions** so no consume slips
+  through the gap (§7.2), and **split the error-state copy** so a recovery-`revoked` link
+  is never mislabelled "already used" (§6.1). Folded in the round-005 advisories: revoke
+  on the primary (§7.2), `revoked` reap TTL (§8.2), clock-offset warn margin ≥3 s (§8.1),
+  and the multi-email confirmation copy (§5.0). **Converged at round 006** — 4/4 critics
+  report nothing material to add.
