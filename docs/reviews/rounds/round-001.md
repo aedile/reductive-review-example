@@ -5,78 +5,102 @@
 - **Per-critic files:** `round-001/{security,systems,product,skeptic}.md`
 - **Verdict:** **Far from done.** Not converged — 4/4 critics request another round.
 
-## Counts (after de-duplication)
+## Counts (after arbitration and de-duplication)
 
 | Severity | Count |
 |----------|:-----:|
 | BLOCKER  | 3 |
-| FINDING  | 7 |
-| ADVISORY | 5 |
+| FINDING  | 11 |
+| ADVISORY | 4 |
 
-Raw critic output overlapped (enumeration and the send path were each raised by
-two lenses). The arbiter merges duplicates into one finding attributed to both.
+Raw, the panel returned 10 BLOCKER / 16 FINDING / 10 ADVISORY across four files —
+heavily overlapping, and with genuine disagreement on severity. The arbiter's job
+this round is mostly **adjudication**, recorded below.
 
-## BLOCKERs (must fix before v0.2 can be trusted)
-
-| # | § | Title | Raised by |
-|---|-----|-------|-----------|
-| B1 | §3.2 | No expiry / replayable link | Security, Systems (state machine) |
-| B2 | §2.1 | No send rate-limiting | Security, Systems |
-| B3 | §3.1 | Predictable / low-entropy token | Security |
-
-## FINDINGs (substantive; should fix)
+## BLOCKERs (3) — must fix before v0.2 can be trusted
 
 | # | § | Title | Raised by |
 |---|-----|-------|-----------|
-| F1 | §4.0 | Account enumeration via response | Security, Product |
-| F2 | §3.4 | No session rotation (fixation) | Security |
-| F3 | §5.0 | No delivery-failure path | Systems, Product |
-| F4 | §3.3 | Clock skew undefined once expiry exists | Systems |
-| F5 | §6.0 | Cross-device open undefined | Product |
-| F6 | §6.1 | Error/empty/edge + accessibility undefined | Product |
-| F7 | §1 | No account-recovery / lockout story | Skeptic |
+| B1 | §3.1 | Timestamp-derived token, no at-rest hashing — forgeable credential | Security, Systems |
+| B2 | §3.2/§3.3 | No expiry, no single-use, no atomic state machine — replayable + unimplementable verify | Security, Systems |
+| B3 | §3.4 | No session rotation on login — session fixation | Security |
 
-## ADVISORYs (worth noting; may defer)
+These three each independently yield account takeover, and they chain with F1/F2
+into an unauthenticated-takeover path. Undisputed.
+
+## FINDINGs (11) — substantive; should fix
 
 | # | § | Title | Raised by |
 |---|-----|-------|-----------|
-| A1 | §3 | Tokens may leak into logs | Security |
-| A2 | §5 | Email copy / trust signals unspecified | Product |
-| A3 | §3 | No send/verify metrics | Systems |
-| A4 | §5 | Link branding unspecified | Product |
-| A5 | §1 | Threat model unstated | Skeptic |
+| F1 | §2.1 | No send rate-limiting / idempotency / burst protection | Security, Systems, Skeptic |
+| F2 | §4.0 | Account enumeration via differential response | Security, Product, Skeptic |
+| F3 | §5.0 | Delivery failure unhandled; no "didn't get it" path; single-channel availability | Product, Systems, Security, Skeptic |
+| F4 | §6.0 | Cross-device open undefined (incl. email-scanner pre-fetch consuming a single-use token) | Product, Security, Skeptic |
+| F5 | §6.1 | Error / empty / edge states undefined | Product |
+| F6 | §6.1 | Accessibility of emails and pages unspecified | Product |
+| F7 | §5/§3 | Email trust signals / anti-phishing content undefined | Product |
+| F8 | §1 | No stated threat model | Skeptic, Security |
+| F9 | §1 | Account recovery / email-loss lockout is unowned | Skeptic, Product, Security |
+| F10 | §1 | No success criteria / acceptance bar | Skeptic |
+| F11 | §3 | No observability/metrics and no token-retention policy | Systems |
 
-## Arbiter decisions
+## ADVISORYs (4)
 
-There was no real disagreement on severity this round; the work is in
-**prioritization**, not adjudication. Decisions:
+| # | § | Title | Raised by |
+|---|-----|-------|-----------|
+| A1 | §3.3 | Clock-skew authority undefined once expiry exists | Security, Systems |
+| A2 | §2.1 | No request-submission feedback / double-submit guard / client validation | Product |
+| A3 | §3.3 | §3.3 is an empty placeholder; section numbering irregular (weakens the audit trail) | Skeptic |
+| A4 | §1 | Premise unjustified — no rationale for magic links over passkeys/OTP | Skeptic |
 
-- **v0.2 closes all three BLOCKERs.** The token is the credential, so B1+B3 are
-  one coherent rewrite of §3; B2 is the send path. Nothing else is trustworthy
-  until these land.
-- **Fold F1 (enumeration) into v0.2 as well.** It is cheap — a single uniform
-  response (§4.0) closes it — and it was raised by two lenses. No reason to carry it.
-- **Carry F2–F7 to subsequent rounds.** They are real and will be tracked to
-  closure; they are not ship-stoppers and several (F4 clock-skew) only become
-  concrete *after* the v0.2 token rewrite exists.
-- **Advisories logged, none actioned this round.** A1 and A3 will be revisited once
-  the token has real entropy (an entropy-free token in a log is moot).
-- **Anti-rubber-stamp note:** this is round 1, so there is no prior round to
-  rubber-stamp. The guard to watch from here is the opposite — a future sudden
-  collapse to zero. Recorded so round 2 checks it.
+## Arbiter adjudications (where the panel disagreed)
+
+1. **Cross-device (F4): Product graded BLOCKER, Security/Skeptic FINDING → resolved
+   FINDING.** It strands real users and has a security edge (scanner pre-fetch), but
+   it cannot be designed until the B1/B2 token rewrite exists. It is a FINDING that
+   the v0.2 token work must not foreclose, not an independent ship-blocker.
+2. **Threat model (F8): Skeptic graded BLOCKER, Security graded ADVISORY → resolved
+   FINDING, and required for v0.2.** The Skeptic is right that without it the other
+   findings have no acceptance bar; Security is right that a missing threat model is
+   not itself a takeover. Landing in the middle: it is a FINDING, and it is pulled
+   into v0.2 scope because several other gradings depend on it.
+3. **Recovery/lockout (F9): Skeptic BLOCKER, Product FINDING, Security ADVISORY →
+   resolved FINDING.** An accepted, *stated and owned* "recovery is delegated to X"
+   is a sufficient resolution; the defect is silence, not the absence of a built
+   recovery flow. FINDING.
+4. **Product's §6.1 and §5.0 BLOCKERs → downgraded to FINDING (F3, F5).** Real and
+   user-stranding, but the document's *trust* hinges on the auth core (B1–B3); the
+   UX-completeness gaps are substantive findings, not trust blockers.
+5. **Premise justification (Skeptic FINDING) → downgraded to ADVISORY (A4).** The
+   passwordless choice is defensible; documenting the alternatives is good practice,
+   not material to trust.
+
+No averaging: each contested item is decided and the reasoning recorded.
 
 ## Required revisions for v0.2
 
-1. **§3.1** — Replace the timestamp-derived token with 32 bytes from a CSPRNG;
-   store only its hash. (B3)
-2. **§3.2** — Make the token single-use, invalidated server-side on consume, with a
-   short absolute expiry (10 min). (B1)
-3. **§3.3** — As a consequence of adding expiry, state that expiry is evaluated
-   against server time with a fixed skew tolerance. (pre-empts F4)
-4. **§2.1 / §2.2** — Rate-limit sends per address and per IP with backoff; one live
-   token per account (idempotency). (B2)
-5. **§4.0** — Single uniform "if an account exists, we've sent a link" response with
-   matched timing. (F1)
-6. **Changelog** — append the v0.2 entry recording the above.
+The arbiter does **not** scope v0.2 to "everything." It closes the BLOCKERs and the
+findings that are unambiguous, security-adjacent, or prerequisite to grading the
+rest; it carries the UX-completeness and premise findings to round 2.
 
-After these, re-review v0.2 with a fresh full read and **perturbed** prompts.
+1. **§3.1** — CSPRNG token ≥128 bits, stored only as a hash, constant-time compare. (B1)
+2. **§3.2/§3.3** — Single-use with atomic compare-and-set consume; short absolute
+   expiry; defined issued/consumed/expired terminal states. (B2)
+3. **§3.3** — Evaluate expiry against server time with a small stated skew tolerance;
+   fill the empty placeholder. (A1, A3)
+4. **§3.4** — Rotate session id on login; set `HttpOnly`/`Secure`/`SameSite`. (B3)
+5. **§2.1/§2.2** — Per-address + per-IP rate limits with backoff; one live token per
+   account (idempotency/coalescing). (F1)
+6. **§4.0** — Uniform "if an account exists, we've sent a link" response, matched
+   timing, no side-effect leak. (F2)
+7. **§7 (new)** — State the threat model (inbox as trust root, out of scope) and
+   **own** the recovery/lockout dependency by delegating it explicitly. (F8, F9)
+8. **§8 (new)** — Send/verify metrics and a token-retention/reaping policy; raw
+   tokens never logged. (F11)
+9. **§1** — One-line rationale for the passwordless choice; regularize numbering. (A4, A3)
+10. **Changelog** — append the v0.2 entry.
+
+**Carried to round 2:** F3 (delivery UX), F4 (cross-device), F5 (error states),
+F6 (accessibility), F7 (trust signals), F10 (success criteria), A2 (request feedback).
+
+Re-review v0.2 with a fresh full read and **perturbed** prompts.
