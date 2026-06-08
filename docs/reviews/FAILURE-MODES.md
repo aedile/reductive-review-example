@@ -8,18 +8,25 @@ much we can actually back up.
 
 Three buckets:
 
-- **Wheat**: objections with real grounding (evidence, a citable result, or logical
-  necessity). Addressed from the ground up, with mitigations.
+- **Wheat**: objections whose *core* has real grounding (evidence, a citable result, or
+  logical necessity). The bucket grades the **objection**, not our rebuttal: several
+  entries have a grounded objection plus a *mitigation we have not measured*, and those
+  mitigations are tagged inline as bets, not results. Do not read a tagged mitigation as
+  certifying the objection ungrounded; the objection is why the entry is here.
 - **Chaff**: objections that *sound* rigorous but are intuition or hard opinion. For
   each, the strongest "well, actually…", which either kills the objection or forces
   us to refine it into something defensible.
 - **The universal ceiling**: objections that are true but **not differential**: they
   limit *all* review (human panels, peer review, even formal methods), so they argue
-  for humility, not against this method specifically.
+  for humility, not against this method specifically. (One item we first filed here turned
+  out to *be* differential on review; it has been pulled out below, which is the honest
+  thing to do when a classification breaks.)
 
 > Citations are named so you can check them; verify before quoting. Where a claim is
-> intuition rather than evidence, it says so. This file practices what the repo
-> preaches: graded, located, and honest about its own confidence.
+> intuition rather than evidence, it says so. Caveat on this file itself: it gets no
+> executable critic and no external panel, so its own "convergence" is asserted by the
+> author, not demonstrated. Treat its confidence claims as the same kind of judgment it
+> warns about, not as audited fact.
 
 ---
 
@@ -128,23 +135,26 @@ verifier-generator gap "collapses" under one model. It does not.)*
   thing that fully leaves the model's epistemic basis), and decorrelate with non-LLM
   and human checkers (W3).
 
+### W8. Subtraction reaches "unobjectionable," not "excellent"
+A real limitation with a fixable half. (We first filed this as chaff, then conceded its
+kernel survives, so it belongs in Wheat; leaving it in Chaff while admitting it was wheat
+would be the muddle this restructure exists to fix.)
+- **The fixable half:** if a lens's mandate is "object to anything mediocre, unoriginal,
+  or that fails to delight," then *not excellent* becomes a finding and gets minimized
+  like any other. The wall isn't *absolute*; it depends on whether your panel has an
+  ambition lens.
+- **The grounded kernel:** subtraction can *demand* excellence (flag its absence) but
+  cannot *generate* the creative content that satisfies the demand; that needs an
+  additive/generative pass the loop structurally lacks. So reductive review raises the
+  floor toward "unobjectionable *by your lenses*"; the ceiling needs a quality lens
+  **and** a generative step.
+
 ---
 
 ## Chaff: intuitions and hard opinions
 
-### C1. "Subtraction converges to *unobjectionable*, never *excellent*"
-**Honest correction (this was misfiled as chaff): the objection's kernel survives, it
-is closer to wheat.** Only the *absolute phrasing* ("can't *reach* excellence") was chaff.
-- **The chaff part:** if a lens's mandate is "object to anything mediocre, unoriginal,
-  or that fails to delight," then *not excellent* becomes a finding and gets minimized
-  like any other. So the wall isn't *absolute*, it depends on whether your panel has an
-  ambition lens.
-- **The kernel that survives (don't pretend it didn't):** subtraction can *demand*
-  excellence (flag its absence) but cannot *generate* the creative content that satisfies
-  the demand, that needs an additive/generative pass the loop structurally lacks. So
-  reductive review raises the floor toward "unobjectionable *by your lenses*"; the ceiling
-  needs a quality lens **and** a generative step. Calling the whole objection "chaff" was
-  a motte-and-bailey on our part; the real status is "true, with a fixable half."
+(The entry once numbered C1, "subtraction can't reach excellence," was reclassified to
+W8 in Wheat above, since its kernel is grounded. C2 through C5 keep their numbers.)
 
 ### C2. "Local minima: you can only descend in the subspace your critics span"
 The gradient-descent framing is an **analogy**, not mathematics. The objection surface
@@ -186,13 +196,6 @@ Plausible from OOD/calibration intuition, but largely unsupported here.
 These are real and old. Their trap is that they sound like indictments of reductive
 review when they are limits on **all** review.
 
-- **The criterion problem / underdetermination.** "Material" has no external definition
-  except what the panel stops objecting to, so "good enough" is defined by the process
-  meant to measure it. *(Caveat: this one is only **partly** universal. An executable
-  test or a formal property has a criterion external to the reviewer, it holds or it
-  doesn't, so panel-defined "material" is **more** circular than spec-defined
-  correctness. This is a **differential** weakness of LLM-panel review, and it is exactly
-  what the executable critic escapes. We shouldn't have filed it as fully shared.)*
 - **The Münchhausen trilemma.** Why trust the arbiter? Every justification bottoms out
   in circularity, infinite regress, or an axiom. Here the axiom is "the arbiter's call."
 - **Consensus ≠ truth.** Agents agreeing is a social fact, not a truth-maker.
@@ -210,6 +213,16 @@ written criterion (graded findings), an explicit arbiter-of-record, a versioned 
 trail, a stated termination signal, this method sits above one-shot review. That is a
 claim about *legibility, not correctness*: a fully-auditable process can still be wrong
 (recall is unobservable, W2). "Above on the paperwork" is the most it earns here.
+
+### One that is *not* universal: the criterion problem is differential
+We first filed this under the ceiling above, then caught the error. "Material" has no
+external definition except what the panel stops objecting to, so "good enough" is defined
+by the process meant to measure it. But that circularity is **not** shared by all review:
+an executable test or a formal property has a criterion external to the reviewer (it holds
+or it doesn't), so panel-defined "material" is *more* circular than spec-defined
+correctness. This is a **differential** weakness of LLM-panel review, and it is exactly
+what the executable critic (a checker with an external criterion) escapes for the claims it
+can reach. Leaving it in the "everyone shares this" bucket understated a real, fixable gap.
 
 - **What we do:** keep the language humble ("converged" = "no material objection
   survived," never "correct"); ground the criterion externally wherever possible
