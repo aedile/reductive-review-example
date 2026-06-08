@@ -13,27 +13,15 @@ surface down toward zero: to shrink the set of legitimate, material criticisms t
 remain, the way gradient descent shrinks an error term. You're not adding to the
 document. You're subtracting from the pile of things still wrong with it.
 
-That "shrink the error term" framing isn't decoration, and it isn't mine. The
-closest cousin to this idea in the agent world is Andrej Karpathy's *autoresearch*
-loop — an agent that edits one training script, runs a time-boxed experiment,
+If the "iterate toward a goal until it converges" shape feels familiar, it should:
+it's the same loop Andrej Karpathy's *autoresearch* uses for machine-learning
+experiments — an agent edits one training script, runs a time-boxed experiment,
 measures the result against a metric, and keeps or reverts the change, all night.
-It's hill-climbing for knowledge work: a closed loop with a number that's supposed
-to go down. Reductive review is the same shape pointed at a document instead of a
-training run, with a panel of adversaries standing in for the metric.
-
-I want to be precise about the debt, because it's larger than a borrowed word or
-two. I'd been running review roughly this way for a while before Karpathy published
-autoresearch — the practice came first, in my hands at least. But practice isn't the
-same as understanding it. What Karpathy actually gave the rest of us was a
-**framework and a vocabulary for the whole class of thing**: the idea that "many
-iterations toward a goal" is a *named pattern* with parts you can point at — a loop,
-a metric, a keep-or-revert rule, a convergence signal — rather than a habit you
-happen to have. That framing is what let me formalize what I was already doing:
-descent, error term, convergence, the residual surface that's supposed to shrink. I
-could run the process. I could not have *explained* it this cleanly on my own, and
-an unexplained process can't be taught, audited, or handed to anyone else. Giving a
-fuzzy practice a precise mental model is the harder and more generous contribution,
-and it's the one I'm leaning on here.
+Reductive review points that loop at a document instead of a training run, with a
+panel of adversaries standing in for the metric. The credit for naming and
+popularizing the closed-loop, measure-and-keep pattern is his; the contribution here
+is narrow — applying it to document review with a structured findings taxonomy as
+the thing being minimized.
 
 ## What the loop looks like
 
@@ -102,10 +90,15 @@ quit, and from the outside those look identical. So guard against it deliberatel
   it. Quiet downgrades are how real gaps slip through a panel that's pretending to
   converge.
 
-The worked example that accompanies this article leans into this on purpose. In its
-second round the panel downgrades three findings to advisories — and each critic
-*flags its own downgrade for the arbiter*, who then pulls all three back into scope
-rather than letting them evaporate. That's the guard doing its job, in writing.
+The worked example that accompanies this article was produced by actually running the
+loop, and it shows the failure mode's opposite in the wild: the panel *refused* to
+coast. It ran six rounds, and in five of them a revision that closed one round's
+findings introduced a new one the next round caught — a fix to the token model that
+reopened an invariant, a recovery channel added without a threat model, a copy edit
+that mislabeled a security state. Two of the four critics converged by round four and
+then kept re-deriving rather than rubber-stamping, which is exactly what let the other
+two keep surfacing regressions until round six. A panel that had agreed to agree would
+have shipped one of those regressions.
 
 ## How this differs from the "Ralph Wiggum" loop
 
@@ -182,17 +175,17 @@ small, but start with the loop.
 
 A minimal, runnable example lives at
 **[github.com/aedile/reductive-review-example](https://github.com/aedile/reductive-review-example)**
-— a small panel, the
-findings format, and the descent wired together, run against a fictional,
-intentionally-flawed passwordless-login spec. The objection count falls 3/7/5 →
-0/2/4 → 0/0/1 across three rounds, and every drop is recorded. Read the rounds in
-order and watch the count fall — including the round where the panel tries to soften
-three findings into advisories and the arbiter won't let it.
+— a small panel, the findings format, and the descent wired together, run against a
+fictional, intentionally-flawed passwordless-login spec. It's a real run, not a tidy
+reenactment: four critic subagents per round, six rounds, an arbiter between each, and
+the objection count goes `3/11 → 3/9 → 1/3 → 0/1 → 0/2 → 0/0` (BLOCKER/FINDING) before
+converging. Note the bulge — the count climbs back up in the middle because the fixes
+introduced regressions, and the loop caught them. Read the rounds in order and watch a
+deliberately broken spec get genuinely hard to break.
 
 ---
 
 *The "Ralph Wiggum" loop is Geoffrey Huntley's
-([ghuntley.com/ralph](https://ghuntley.com/ralph/)). The framework and vocabulary
-for "iterate toward a goal until it converges" — descent, error term, convergence —
-I owe to Andrej Karpathy's autoresearch; it's what let me formalize a practice I
-already had but couldn't yet explain.*
+([ghuntley.com/ralph](https://ghuntley.com/ralph/)). The closed-loop,
+measure-and-keep pattern this borrows is Andrej Karpathy's autoresearch, pointed at
+a document instead of a training run.*

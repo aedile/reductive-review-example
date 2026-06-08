@@ -8,7 +8,15 @@ Companion to the article in [`docs/blog/reductive-descent.md`](docs/blog/reducti
 
 The document under review — a passwordless "magic link" login spec — is
 **fictional and deliberately imperfect**. It exists to be torn apart so you can
-watch the technique work. Read the rounds in order; the objection count falls.
+watch the technique work. Read the rounds in order and watch the objection count
+fall — not smoothly: in five of the six rounds a fix introduced a *new* problem the
+next round caught. That non-monotonic descent is the honest part, and the loop is
+what kept catching the regressions until the panel genuinely had nothing left.
+
+> The review history here was produced by **actually running the loop** — four
+> independent critic subagents per round, six rounds, an arbiter between each — not by
+> hand-authoring a tidy story. The findings are the agents' own; the counts are
+> whatever they actually found.
 
 ## The idea in one paragraph
 
@@ -22,7 +30,7 @@ document; you're subtracting from the pile of things still wrong with it.
 ## What's in here
 
 - [`docs/design/magic-link-auth.md`](docs/design/magic-link-auth.md) — the target
-  document, versioned (v0.1 → v0.3, changelog at the bottom).
+  document, versioned (v0.1 → v0.6, changelog at the bottom).
 - [`docs/reviews/README.md`](docs/reviews/README.md) — the protocol: panel, findings
   format, arbiter, termination. **This is the reusable part.**
 - [`docs/reviews/prompts/`](docs/reviews/prompts/) — one standing brief per critic.
@@ -42,11 +50,18 @@ document; you're subtracting from the pile of things still wrong with it.
 
 ## The descent at a glance
 
-| Round | Doc version | BLOCKER | FINDING | ADVISORY | Verdict       |
-|-------|-------------|:-------:|:-------:|:--------:|---------------|
-| 001   | v0.1        |    3    |    7    |    5     | far from done |
-| 002   | v0.2        |    0    |    2    |    4     | closing       |
-| 003   | v0.3        |    0    |    0    |    1     | converged     |
+| Round | Doc  | BLOCKER | FINDING | ADVISORY | What happened |
+|-------|------|:-------:|:-------:|:--------:|---------------|
+| 001   | v0.1 |    3    |   11    |    4     | the seeded flaws surface |
+| 002   | v0.2 |    3    |    9    |    5     | original BLOCKERs closed — but the fixes opened **3 new** ones |
+| 003   | v0.3 |    1    |    3    |    7     | those closed; the login-denial fix opened **1 new** BLOCKER |
+| 004   | v0.4 |    0    |    1    |    6     | a redesign (drop the single-token invariant) clears BLOCKERs |
+| 005   | v0.5 |    0    |    2    |    5     | the recovery-enumeration fix introduced **2 new** findings |
+| 006   | v0.6 |    0    |    0    |    3     | **converged** — 4/4 critics, nothing material left |
+
+The objection count is not a clean staircase down — it bulges in the middle because
+real revisions introduce real regressions. The point of the loop is that it keeps
+finding them until it can't.
 
 ## Make it yours
 
@@ -59,5 +74,5 @@ and prune lenses that never surface anything material.
 ## Disclaimer
 
 Every document here is fictional. The login spec is intentionally insecure as a
-teaching artifact — **do not ship it.** Even the hardened v0.3 is a worked example,
+teaching artifact — **do not ship it.** Even the converged v0.6 is a worked example,
 not a production design.
