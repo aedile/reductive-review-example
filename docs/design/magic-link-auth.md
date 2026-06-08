@@ -1,7 +1,7 @@
-# Magic Link Login — Design Spec (v0.4)
+# Magic Link Login — Design Spec (v0.5)
 
 > Fictional teaching artifact. This spec began intentionally insecure (v0.1) and was
-> hardened across four recorded review rounds. Even at v0.4 it is a worked example,
+> hardened across five recorded review rounds. Even at v0.5 it is a worked example,
 > not a production design. **Do not implement.**
 
 ## §1 Goal and scope
@@ -40,32 +40,44 @@ any send, and counted (§8.1).
 
 ### §2.2 Concurrent tokens (no invalidation)
 
-A new request **never invalidates an existing token.** Up to **5** concurrently-valid,
-**independently single-use** tokens may exist per account; the §2.1 rate limit is what
-bounds minting. This deliberately replaces the v0.3 "single live token + supersession"
-model, which could neither protect a victim from a third party killing their link nor
-serve a legitimate new-device/lost-tab user without contradiction. With no invalidation:
-a third party cannot kill a victim's link, and a user who re-requests from a fresh
-session simply gets an additional working link. Repeated submits within a short window
-**coalesce to the in-flight send** (no duplicate email) without invalidating anything.
-The replay surface stays bounded by single-use consumption, the 10-minute expiry, and
-the per-account cap.
+A new request **never invalidates an existing token.** Multiple concurrently-valid,
+**independently single-use** tokens may exist per account. The **binding control on the
+live-token count is the §2.1 rate limit** (≤ 3 mints/address/15 min against a 10-min
+expiry ⇒ typically ≤ 3 live); a hard ceiling of **5** is enforced separately as a
+belt-and-suspenders guard so a future relaxation of §2.1 can't silently unbound the
+count. This deliberately replaces the v0.3 "single live token + supersession" model,
+which could neither protect a victim from a third party killing their link nor serve a
+legitimate new-device/lost-tab user without contradiction. With no invalidation: a third
+party cannot kill a victim's link, and a user who re-requests from a fresh session simply
+gets an additional working link (so they may receive **more than one email** — see §5.0).
+Repeated submits within a short window **coalesce to the in-flight send** (no duplicate
+email) without invalidating anything; coalescing is best-effort dedup keyed on a
+short-TTL in-flight marker evaluated **off the synchronous path** (consistent with §4.0,
+so it can't become an existence oracle), and a missed coalesce degrades only to a
+duplicate send bounded by §2.1. The replay surface stays bounded by single-use
+consumption, the 10-minute expiry, and the ceiling.
 
 ## §3 The token
 
 ### §3.1 Generation and lookup
 
 The token is ≥128 bits from a CSPRNG, encoded URL-safe, **not** derived from any
-observable input. We persist only its hash on a **per-token row** keyed/indexed by that
-hash; the index equality *is* the comparison (no plaintext-token row is fetched and
-compared in app code), so there is no application-level timing channel.
+observable input. We persist only its hash on a **per-token row** whose **primary lookup
+is by that hash** (the index equality *is* the comparison — no plaintext-token row is
+fetched and compared in app code, so there is no application-level timing channel). Each
+row also carries an indexed `account_id`; this **account-scoped secondary index** exists
+so recovery (§7.2) can enumerate and revoke an account's live tokens — the primary
+verify path still goes only by hash.
 
 ### §3.2 State machine and single use
 
-States per token: `issued → consumed` (terminal) and `issued → expired` (terminal).
-There is no supersession. Consumption is a single atomic compare-and-set on **the token's
-own hash-keyed row** (`issued → consumed`) — the same row §3.1 resolves at verify time,
-so lookup and the state transition contend on exactly one row by construction. Only the
+States per token: `issued → consumed` (terminal), `issued → expired` (terminal), and
+`issued → revoked` (terminal; only via recovery, §7.2). There is no supersession.
+Consumption is a single atomic compare-and-set on **the token's own hash-keyed row**
+(`issued → consumed`), executed on the **primary / a linearizable path** — the same row
+§3.1 resolves at verify time, so lookup and the state transition contend on exactly one
+row by construction. A stale-replica GET that only *presents* the confirm page (§6.0)
+cannot weaken consumption, because only the primary-side CAS mints a session. Only the
 consume winner mints a session; a second click on the same token loses the CAS and fails
 closed. Tokens are independent: consuming or expiring one has no effect on the others.
 Verifying a token in any terminal state returns the defined response in §6.1. Tokens
@@ -136,8 +148,8 @@ lands on the page they originally tried to reach, or a default home if none.
 ### §6.1 Error, empty, and edge states; accessibility
 
 Defined, account-existence-neutral states, each with plain-language copy and a single
-"send me a new link" action: **expired**, **already used** (consumed), **malformed/
-unrecognized link**, **rate-limited**, **wrong-account**. The "rate-limited" state
+"send me a new link" action: **expired**, **already used** (consumed or
+revoked-by-recovery), **malformed/unrecognized link**, **rate-limited**, **wrong-account**. The "rate-limited" state
 renders **only** as a non-enumerating hint ("Still waiting? Links can take a minute;
 check spam before re-requesting") — never as a throttle confirmation, so it cannot
 re-open the §4.0 enumeration channel. This set is the response §3.2 refers to. Pages meet
@@ -166,7 +178,10 @@ here, we state the dependency as a hard contract — account creation MUST rejec
 an account without a recovery channel, and this design does not function safely
 otherwise — and we **enforce it in-scope at first sign-in**: a legacy/migrated account
 with no recovery channel is prompted to enrol one **before a session is established**;
-until then it is an explicitly owned, named lockout class, not a silent gap.
+until then it is an explicitly owned, named lockout class, not a silent gap. (That
+first-sign-in enrolment is gated by inbox control only, so it inherits the §7.1 trust
+root — it does not protect a legacy account whose inbox is *already* compromised, which
+is out of scope by assumption.)
 
 The recovery method is a second verified channel **independent of the primary email**
 (it must not be reachable solely by controlling that inbox — so a same-provider recovery
@@ -175,8 +190,10 @@ email doesn't count; shared/forwarded-inbox accounts fall to the support-mediate
 evidence. Recovery is inside the threat model: recovery initiation and verification are
 rate-limited and locked out mirroring §2.1; support-mediated recovery is logged/alerted
 (§8); and a **successful recovery rotates the session, terminates the account's other
-active sessions, and invalidates all live login tokens.** The path is held to the
-primary-path bar, so §7.1's claims hold end-to-end.
+active sessions, and invalidates all live login tokens** — the last via the §3.1
+account-scoped index, moving every `issued` row for the account to `revoked` in one
+account-scoped operation, so no attacker-minted link survives recovery. The path is held
+to the primary-path bar, so §7.1's claims hold end-to-end.
 
 ## §8 Observability and retention
 
@@ -187,15 +204,17 @@ alert thresholds — how an abuse spike becomes visible), sent, send-failures, c
 confirmations, logins, expired-link hits, replay attempts, and recovery attempts.
 Leading indicators for the delivery path: a **send-queue depth gauge** with a
 high-water alert and a **dead-letter-rate** counter, so saturation is visible *before*
-sends start failing rather than after.
+sends start failing rather than after. A **node-clock-offset gauge** alerts when any
+app/datastore node drifts toward the §3.3 ≤ 5 s NTP bound, so a drift that would break
+the `now() ≥ expires_at` decision is caught before it affects tokens.
 
 ### §8.2 Logging and retention
 
 Raw tokens are **never** logged; only the hash or an opaque request id appears; email
 addresses in logs are minimised. Token rows are reaped on a stated TTL (consumed: 7
 days; expired: 24 h), but a minimal **tombstone** (hash + state + **`terminal_at`** — the
-time the token entered its terminal state, defined for consumed *and* expired) is
-retained past row-reap for the replay-observation window so any replay stays
+time the token entered its terminal state, defined for consumed, expired, *and* revoked)
+is retained past row-reap for the replay-observation window so any replay stays
 classifiable. Reaping never runs before `expires_at` + the replay-observation window.
 
 ## Changelog
@@ -216,3 +235,10 @@ classifiable. Reaping never runs before `expires_at` + the replay-observation wi
   in-scope at first sign-in with channel independence and session termination (§7.2/§1),
   and the round-003 advisories (success landing, rate-limited rendering, queue/DLQ
   metrics, `terminal_at` tombstone, lockout-rate abandon trigger).
+- **v0.5** — closed the single round-004 FINDING: per-token rows carry an indexed
+  `account_id` so recovery can enumerate and `revoke` all of an account's live tokens
+  (§3.1/§3.2/§7.2), removing the post-recovery foothold. Folded in the round-004
+  advisories: live-token bound attributed to §2.1 with a belt-and-suspenders ceiling and
+  off-path coalescing key (§2.2), linearizable consume CAS (§3.2), legacy-enrolment trust
+  boundary (§7.2), node-clock-offset monitoring (§8.1), and the multi-email expectation
+  (§2.2/§5.0).
