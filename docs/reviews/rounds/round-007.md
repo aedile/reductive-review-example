@@ -97,4 +97,6 @@ to silence these (it is a fictional teaching artifact, and chasing one more corr
 panel past them would just relocate the lesson). We are logging them, in the open, as the
 strongest evidence this repo can offer for its own central claim: if you want correctness
 and not just convergence, change the *kind* of reviewer, and put a human (or a real
-domain expert, or a tool that runs) where the shared blind spots do the most damage.
+domain expert, or a tool that runs) where the shared blind spots do the most damage. And
+know when to stop: the loop ends when no material objection survives a round, but
+releasing with the remaining limits logged is a human call, not a proof.
