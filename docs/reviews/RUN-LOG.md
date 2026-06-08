@@ -5,19 +5,22 @@ just the findings, but the time and tokens each critic spent. The point of reduc
 review is that the whole process is inspectable; that includes the cost.
 
 **Methodology.** Each round spawned the four critics in **parallel** as independent
-subagents. Each was given only its standing brief (`prompts/`), the protocol
-(`README.md`), and the document at its current version — **no target counts**, no sight
-of the other critics' output. Prompts were **perturbed every round** (checklist order
-reordered) to defeat pattern-matching. Between rounds, an arbiter (the orchestrating
+subagents. Each got its standing brief (`prompts/`), the protocol (`README.md`), the
+document at its current version, and round-specific instructions (fresh read, output
+path) — but **no target counts** and no sight of the other critics' output. From round 2
+on, each critic's checklist order was **perturbed** (round 1 is the un-perturbed
+baseline) to defeat pattern-matching. Between rounds, an arbiter (the orchestrating
 session) de-duplicated and adjudicated the findings, then revised the document. The
 critics did a fresh full read each round and were required to *prove* prior closures
 against the text rather than trust the changelog.
 
 **What the numbers are.** Duration and token figures below are what the harness
-reported for each **critic subagent** (its wall-clock and output tokens). They do **not**
-include the arbiter's de-duplication, adjudication, and document-revision work between
-rounds, which is additional. "Round wall-clock" is the parallel critic phase (≈ the
-slowest of the four critics that round), not the sum.
+reported per **critic subagent** — its wall-clock, and the token count the harness
+attributes to that subagent (reported as `subagent_tokens`; treat it as the subagent's
+own token usage, not the round's total). They do **not** include the arbiter's
+de-duplication, adjudication, and document-revision work between rounds, which is
+additional. "Round wall-clock" is the parallel critic phase (≈ the slowest of the four
+critics that round), not the sum.
 
 > Why this lives in a file and not in `git log`: the commit timestamps cluster, because
 > the history was committed in one batch after the run. These durations are the real
@@ -25,7 +28,7 @@ slowest of the four critics that round), not the sum.
 
 ## Per-round summary
 
-| Round | Doc  | Critic wall-clock (parallel) | Σ critic output tokens | Arbitrated B / F / A | Verdict |
+| Round | Doc  | Critic wall-clock (parallel) | Σ critic tokens | Arbitrated B / F / A | Verdict |
 |-------|------|:----------------------------:|:----------------------:|:--------------------:|---------|
 | 001   | v0.1 | ~65 s  | ~58.1k | 3 / 11 / 4 | far from done |
 | 002   | v0.2 | ~91 s  | ~82.7k | 3 / 9 / 5  | 3 new BLOCKERs from the v0.2 fixes |
@@ -34,7 +37,7 @@ slowest of the four critics that round), not the sum.
 | 005   | v0.5 | ~79 s  | ~83.3k | 0 / 2 / 5  | 2 new findings from the v0.5 fixes |
 | 006   | v0.6 | ~77 s  | ~83.7k | 0 / 0 / 3  | **converged** |
 
-**Totals:** 6 rounds · 24 critic runs · **~497k** critic output tokens ·
+**Totals:** 6 rounds · 24 critic runs · **~497k** critic tokens ·
 **~28.5 min** cumulative critic compute · **~9.1 min** summed parallel critic
 wall-clock (arbiter/revision time additional) · 127 critic tool calls.
 
@@ -43,7 +46,7 @@ wall-clock (arbiter/revision time additional) · 127 critic tool calls.
 Raw B/F/A is what each critic reported *before* the arbiter de-duplicated across the
 panel (which is why the raw column sums higher than the arbitrated counts above).
 
-| Round | Critic | Duration | Output tokens | Tool calls | Raw B / F / A |
+| Round | Critic | Duration | Tokens | Tool calls | Raw B / F / A |
 |-------|--------|:--------:|:-------------:|:----------:|:-------------:|
 | 001 | Security Adversary  | 55.5 s | 14,222 | 4 | 3 / 3 / 3 |
 | 001 | Systems Engineer    | 52.0 s | 14,217 | 4 | 2 / 5 / 2 |
