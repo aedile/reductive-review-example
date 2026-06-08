@@ -16,7 +16,9 @@ what kept catching the regressions until the panel genuinely had nothing left.
 > The review history here was produced by **actually running the loop** — four
 > independent critic subagents per round, six rounds, an arbiter between each — not by
 > hand-authoring a tidy story. The findings are the agents' own; the counts are
-> whatever they actually found.
+> whatever they actually found. The whole process is meant to be inspected end to end:
+> the critiques are in [`rounds/`](docs/reviews/rounds/) and the timing/cost of every
+> agent run is in [`RUN-LOG.md`](docs/reviews/RUN-LOG.md).
 
 ## The idea in one paragraph
 
@@ -36,6 +38,8 @@ document; you're subtracting from the pile of things still wrong with it.
 - [`docs/reviews/prompts/`](docs/reviews/prompts/) — one standing brief per critic.
 - [`docs/reviews/rounds/`](docs/reviews/rounds/) — the actual review history. Start
   at [`round-001.md`](docs/reviews/rounds/round-001.md).
+- [`docs/reviews/RUN-LOG.md`](docs/reviews/RUN-LOG.md) — the meter: per-critic
+  duration, tokens, and tool calls for all 24 agent runs. How long it took, what it cost.
 - [`.claude/agents/`](.claude/agents/) + [`.claude/commands/`](.claude/commands/) —
   wiring to run a round in one command.
 

@@ -74,6 +74,15 @@ Convergence is the exit signal — not fatigue, not a round budget, not the huma
 losing patience. A single residual ADVISORY does not block convergence; an open
 FINDING or BLOCKER does.
 
+## Transparency
+
+The process is meant to be audited end to end, not just trusted. Every critic's raw
+output is kept in `rounds/round-NNN/`, every arbiter decision in `rounds/round-NNN.md`,
+and the **timing and token cost of every agent run** in
+[`RUN-LOG.md`](RUN-LOG.md). Keep it that way: never run the loop on content you can't
+publish, and when you can, publish the whole trail — the slow rounds and the regressions
+included. (Secret or internal documents are exactly what *not* to run this on in public.)
+
 ## Anti-rubber-stamp guards (do not skip)
 
 Convergence rots into agreement theater: after a few rounds the critics start
