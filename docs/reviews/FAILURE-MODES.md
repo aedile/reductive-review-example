@@ -212,3 +212,10 @@ The escape is a **different *kind* of checker**, ideally one that **runs**: a te
 type, a fuzzer, a proof, a human. The highest-leverage move in this whole document is to
 stop asking the model what it thinks and start asking the world what happens — to convert
 judgment into computation wherever the document makes a claim you can execute.
+
+This repo does that, so the claim isn't just asserted: [`EXECUTABLE-CRITIC.md`](EXECUTABLE-CRITIC.md)
+is a non-LLM model-checker ([`scripts/executable_critic.py`](../../scripts/executable_critic.py))
+that tests three v0.6 claims by computation. It corroborated the design from a fully
+decorrelated source, *computed* the live-token maximum the panel had only argued (3, not
+5), and its negative controls reproduce the earlier recovery-ordering bug (F19) — proof
+that a checker which runs catches what reasoning asserts.

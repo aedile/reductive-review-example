@@ -43,6 +43,10 @@ document; you're subtracting from the pile of things still wrong with it.
 - [`docs/reviews/FAILURE-MODES.md`](docs/reviews/FAILURE-MODES.md) — where the descent
   lies to you (local minima, Goodhart, unobservable recall, consensus≠truth), sorted
   into what's grounded vs. what's just plausible.
+- [`docs/reviews/EXECUTABLE-CRITIC.md`](docs/reviews/EXECUTABLE-CRITIC.md) +
+  [`scripts/executable_critic.py`](scripts/executable_critic.py) — a non-LLM lens that
+  *runs*: model-checks three v0.6 claims (with negative controls), the one critic the
+  other six structurally couldn't be.
 - [`.claude/agents/`](.claude/agents/) + [`.claude/commands/`](.claude/commands/) —
   wiring to run a round in one command.
 - [`scripts/check-consistency.sh`](scripts/check-consistency.sh) — audits the trail's
