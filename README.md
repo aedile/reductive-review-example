@@ -13,12 +13,16 @@ fall, not smoothly: in four of the six rounds a fix introduced a *new* problem t
 next round caught. That non-monotonic descent is the honest part, and the loop is
 what kept catching the regressions until the panel genuinely had nothing left.
 
-> The review history here was produced by **actually running the loop**: four
-> independent critic subagents per round, six rounds, an arbiter between each, not by
+> The review history here was produced by **actually running the loop**: four critic
+> subagents per round (separate prompts and contexts, but the same underlying model, see
+> the limitation note in the protocol), six rounds, an arbiter between each, not by
 > hand-authoring a tidy story. The findings are the agents' own; the counts are
 > whatever they actually found. The whole process is meant to be inspected end to end:
 > the critiques are in [`rounds/`](docs/reviews/rounds/) and the timing/cost of every
-> agent run is in [`RUN-LOG.md`](docs/reviews/RUN-LOG.md).
+> agent run is in [`RUN-LOG.md`](docs/reviews/RUN-LOG.md). Then read
+> [`round-007.md`](docs/reviews/rounds/round-007.md): after the panel converged, a
+> decorrelated review of a *different kind* found real flaws it had all missed. That is
+> the point, not a footnote.
 
 ## The idea in one paragraph
 

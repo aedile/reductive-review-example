@@ -94,13 +94,13 @@ quit, and from the outside those look identical. So guard against it deliberatel
 
 The worked example that accompanies this article was produced by actually running the
 loop, and it shows the failure mode's opposite in the wild: the panel *refused* to
-coast. It ran six rounds, and in four of them a revision that closed one round's
-findings introduced a new one the next round caught, a fix to the token model that
-reopened an invariant, a recovery channel added without a threat model, a copy edit
-that mislabeled a security state. Three of the four critics reported zero blockers and
-findings by round four and then kept re-deriving their prior closures instead of
-coasting, which is exactly the posture that let the panel keep catching the
-regressions those cleanup edits introduced, right through round five. A panel that had
+coast. It ran six rounds, and four of the five revisions introduced a new problem the
+next round caught: a recovery channel added without a threat model, a token-model fix
+that reopened an invariant, a multi-token refactor that left recovery unable to revoke,
+and a copy edit that mislabeled a security state. The critics that caught the late
+regressions were not the ones coasting: the round-five problems were surfaced by the
+systems lens, which had not yet converged, and the product lens, which had gone quiet at
+round three and *re-opened* a finding rather than rubber-stamping. A panel that had
 agreed to agree would have shipped one of them.
 
 One caveat, stated plainly because you'll think it anyway: in that example the critics,

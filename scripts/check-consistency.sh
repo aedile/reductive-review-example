@@ -30,6 +30,12 @@ graded() { awk '
 note "== 1. RUN-LOG raw counts vs round files (no silent skips) =="
 checked=0
 for n in 001 002 003 004 005 006; do
+  # extra/misnamed critic files would be invisible to the fixed name loop below;
+  # assert each round dir holds exactly the 4 expected critic files and nothing else.
+  actual_files=$(find "$ROUNDS/round-$n" -maxdepth 1 -name '*.md' 2>/dev/null | wc -l | tr -d ' ')
+  if [ "$actual_files" -ne 4 ]; then
+    note "  FAIL round-$n dir has $actual_files .md files, expected exactly 4"; fail=1
+  fi
   for c in security systems product skeptic; do
     if [ ! -f "$ROUNDS/round-$n/$c.md" ]; then
       note "  FAIL missing file: round-$n/$c.md"; fail=1; continue
@@ -58,6 +64,9 @@ if [ "$rl_rows" -ne 24 ]; then note "  FAIL RUN-LOG has $rl_rows detail rows, ex
 
 note "== 2. README descent table vs round aggregate count tables =="
 for n in 001 002 003 004 005 006; do
+  if [ ! -f "$ROUNDS/round-$n.md" ]; then
+    note "  FAIL missing aggregate file: round-$n.md"; fail=1; continue
+  fi
   b=$(grep -cE '^\| B[0-9]' "$ROUNDS/round-$n.md")
   f=$(grep -cE '^\| F[0-9]' "$ROUNDS/round-$n.md")
   a=$(grep -cE '^\| A[0-9]' "$ROUNDS/round-$n.md")
@@ -78,7 +87,7 @@ note "== 4. RUN-LOG exact arithmetic (run count, tool-call total) =="
 # Recompute from the per-critic detail table: column 2 = round, col 5 = tool calls.
 runs=$(grep -cE '^\| 00[1-6] \|' "$RUNLOG")
 tools=$(grep -E '^\| 00[1-6] \|' "$RUNLOG" | awk -F'|' '{t=$6; gsub(/ /,"",t); s+=t} END{print s}')
-stated_runs=$(grep -oE '24 critic runs' "$RUNLOG" | head -1 | grep -oE '^[0-9]+')
+stated_runs=$(grep -oE '[0-9]+ critic runs' "$RUNLOG" | head -1 | grep -oE '^[0-9]+')
 stated_tools=$(grep -oE '[0-9]+ critic tool calls' "$RUNLOG" | head -1 | grep -oE '^[0-9]+')
 if [ "$runs" != "${stated_runs:-x}" ]; then note "  FAIL run count: table=$runs stated=$stated_runs"; fail=1; fi
 if [ "$tools" != "${stated_tools:-x}" ]; then note "  FAIL tool-call total: table sums to $tools, stated $stated_tools"; fail=1; fi

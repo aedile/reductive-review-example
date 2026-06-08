@@ -27,13 +27,14 @@ part of this example:
   ones* (unscoped recovery channel, invariant-without-state, dangling error-state ref).
 - **R002→R003:** v0.3 closed those, and its login-denial fix *introduced 1 new BLOCKER*
   (session-scoped supersession vs the single-live-token invariant).
-- **R003→R004:** v0.4's redesign (drop the invariant) finally cleared BLOCKERs, leaving
-  1 FINDING (recovery had no token-enumeration path).
+- **R003→R004:** v0.4's redesign cleared the BLOCKERs, but the same multi-token refactor
+  *introduced 1 new FINDING* (recovery had no token-enumeration path, F18).
 - **R004→R005:** v0.5 closed it but *introduced 2 new FINDINGs* (recovery step-ordering
   race; `revoked` mislabelled "already used").
 - **R005→R006:** v0.6's surgical fixes closed both and introduced nothing.
 
-Four of the six rounds saw a fix create the next round's headline issue. A one-shot
+So four of the five revisions (v0.2, v0.3, v0.4, v0.5) introduced a regression the next
+round caught; only v0.6 did not. A one-shot
 review, or a descent that stopped at the first "looks better", would have shipped
 one of those regressions. The loop is what caught them.
 
@@ -49,8 +50,9 @@ A collapse to zero is exactly the moment to distrust, so the arbiter did not acc
 - Prompts were perturbed for the sixth straight round, so no critic could pattern-match
   its own prior output.
 - Convergence is **not** unanimous-by-silence: it is unanimous-after-each-lens-tried-
-  and-failed-to-find-a-material-issue, two of them having converged as early as R004
-  and continued to re-verify rather than coast.
+  and-failed-to-find-a-material-issue. Security reached zero as early as round 3 and the
+  Skeptic by round 4, and both then kept re-deriving rather than coasting (Product also
+  hit zero at round 3 but re-opened a finding at round 5, which is the guard working).
 
 ## Residual ADVISORYs (logged, do not block convergence)
 
