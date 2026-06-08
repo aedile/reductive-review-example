@@ -42,6 +42,9 @@ document; you're subtracting from the pile of things still wrong with it.
   duration, tokens, and tool calls for all 24 agent runs. How long it took, what it cost.
 - [`.claude/agents/`](.claude/agents/) + [`.claude/commands/`](.claude/commands/) —
   wiring to run a round in one command.
+- [`scripts/check-consistency.sh`](scripts/check-consistency.sh) — audits the trail's
+  own bookkeeping (RUN-LOG counts vs round files, README table vs aggregates, citations
+  vs the doc). Run it after any edit.
 
 ## How to run it
 
