@@ -1,74 +1,75 @@
 # The Executable Critic — a non-LLM lens that runs
 
-[`FAILURE-MODES.md`](FAILURE-MODES.md) ends on a claim: the only verifier that fully
-escapes a language model's shared blind spots is **a different *kind* of checker that
-runs** — convert judgment into computation. A repo that asserts that and never does it
-is exactly the claim-without-artifact gap this project keeps hunting. So here is the
-artifact.
-
-[`scripts/executable_critic.py`](../../scripts/executable_critic.py) is a zero-dependency
-Python model-checker that tests three claims in `magic-link-auth.md` **v0.6** by
-computing over them, not by reasoning about them. It shares no training data and no
-reasoning basis with the LLM panel — it is the most decorrelated critic in the repo.
-
-Run it yourself:
+[`FAILURE-MODES.md`](FAILURE-MODES.md) argues the highest-leverage check is a
+*different kind* of verifier that runs — convert judgment into computation. A repo that
+asserts that and never does it has a claim without an artifact. So here is the artifact,
+[`scripts/executable_critic.py`](../../scripts/executable_critic.py): a zero-dependency
+model-checker over three v0.6 claims.
 
 ```
 python3 scripts/executable_critic.py
 ```
 
-## What it checks, and what it found
+## What "decorrelated" does and does not mean here
 
-Each check ships with a **negative control** — a deliberately broken variant the check
-must flag — so a PASS on the real design means something rather than nothing.
+Be precise, because the easy version of this claim is false. The critic is decorrelated
+from the LLM panel **at the execution layer** — it computes interleavings in Python
+instead of predicting tokens, so it cannot inherit a reasoning slip. It is **not**
+decorrelated in *agenda*: its constants and the properties it checks were transcribed
+from the spec and from the panel's own findings (A19, F19) by the same hand. So it can
+only test claims someone already thought to make — **it cannot find a flaw no lens looked
+for, and it cannot catch a blind spot the panel shares.** It is a calculator pointed at
+the panel's arithmetic, not an independent oracle.
 
-| # | Claim (v0.6) | Result | Negative control |
-|---|--------------|--------|------------------|
-| 1 | §2.2 live-token count is capped, rate limit binds | **max live = 3**, cap of 5 never binds | a loose 7/15min limit *does* breach the cap of 5 ✓ |
-| 2 | §3.2 atomic CAS ⇒ at most one winner, fail-closed | **single winner over every interleaving** | the non-atomic variant double-spends (all 3 ops "win") ✓ |
-| 3 | §7.2 revoke-then-terminate leaves no attacker session | **safe under every interleaving** | the v0.5 terminate-then-revoke order *is* unsafe ✓ |
+## What it checks (each with a negative control the same engine must trip)
 
-All three negative controls tripped, so the checks have teeth. The verdict on v0.6:
-**no new BLOCKER or FINDING.** One ADVISORY, below.
+The earlier version of this file oversold two of these as "computed the real maximum"
+and "model-checked over every interleaving" when the code was actually a pair of
+tautologies. That was caught in review and the checks were rewritten to genuinely
+enumerate interleavings; here is what they now do.
+
+| # | Claim (v0.6) | How it's checked | Result | Control (proves the check can fail) |
+|---|--------------|------------------|--------|-------------------------------------|
+| 1 | §2.2 live-token count is bounded; the rate limit binds | a **packing search** that couples TTL and the rate window (greedy-optimal, 1-min grid) | **max live = 3** | a `3/5min, 15min-ttl` regime computes **9 > 5** — so the search isn't a constant |
+| 2 | §3.2 atomic CAS ⇒ at most one winner, fail-closed | **one** interleaving engine over read/write sub-steps, `atomic` flag fuses read+write | atomic ⇒ winner-counts **{1}** | the *same* engine non-atomic ⇒ **{1,2,3}** (double/triple-spend) |
+| 3 | §7.2 revoke-then-terminate leaves no attacker session | revoke modeled as a **per-row loop**, terminate as snapshot-then-kill, attacker consume (CAS+mint, atomic per §3.2) interleaved | **safe over every interleaving** | v0.5 terminate-then-revoke **is unsafe**; and if mint is *not* fused with consume, even v0.6 **breaks** |
+
+All four negative controls trip. Verdict on v0.6: **no new BLOCKER or FINDING**, one
+ADVISORY (below).
 
 ## The honest headline
 
-It did **not** catch something four LLM critics missed — v0.6 holds up on these three
-claims. That is the expected, reassuring outcome after six rounds, and it would have
-been dishonest to manufacture drama. The value is different and real:
+It did **not** find something four LLM critics missed — v0.6 holds on these three
+claims, and it would have been dishonest to manufacture otherwise. Given the agenda
+caveat above, finding nothing *new* was the likely outcome; the value is narrower and real:
 
-- **It proved by execution what the panel only argued.** "Exactly one of {consume,
-  revoke, expire} wins" and "no attacker session survives recovery" went from *reasoned*
-  to *model-checked over every interleaving.*
-- **It independently re-derived a logged advisory.** Round 4 (Security, Skeptic)
-  *argued* the §2.2 ceiling of 5 was unreachable. The critic *computed* the real maximum
-  — exactly **3** — from a source with none of their priors. An LLM agreeing with an LLM
-  is an echo; a model-checker agreeing is corroboration.
-- **It reproduced a real fixed bug.** The negative control for check 3 is literally the
-  v0.5 recovery ordering, and the critic flags it unsafe — confirming round-5 finding
-  **F19** was a true positive, not a hallucination, and that v0.6 closes it.
-- **It demonstrated why a requirement matters.** Check 2's negative control shows a
-  non-atomic compare-and-set double-spends. The spec's insistence on *atomic* CAS isn't
-  ceremony; remove it and the property breaks, on demand.
-
-## The one finding
-
-- **ADVISORY §2.2** — the hard ceiling of 5 is unreachable; the computed maximum
-  simultaneously-live token count under the §2.1 rate limit (≤3/15min) and the §3.2
-  10-minute expiry is **3**. This is not a defect: the spec already frames the 5 as a
-  *belt-and-suspenders* guard against a future relaxation of §2.1, so a slack cap today
-  is the intended state. The critic confirms the slack is real and pins the live number.
-  Logged, not actioned — same disposition as the round-4 advisory it reproduces.
+- **The checks now have teeth.** Check 2's atomic PASS means something *because the same
+  engine, non-atomic, fails* — atomicity is shown to be necessary, not assumed. Check 3
+  distinguishes the v0.5 and v0.6 orderings and shows the "mint is fused with consume"
+  premise is load-bearing (drop it and even v0.6 breaks). These are genuine model-checks,
+  not `return True` in a permutation loop.
+- **It computes, rather than argues, the §2.2 bound.** The packing search returns 3 here
+  and 9 in a ttl>window regime — so the "3, not 5" result is a computation, not the
+  identity function the first version shipped. It corroborates round-4 advisory A19 from
+  the execution layer.
+- **F19 is a consistency check, not independent confirmation.** Check 3's control *is*
+  the v0.5 ordering, hand-modeled by the same author who wrote F19, so the model agreeing
+  with the finding shows internal consistency — not an outside oracle vouching for it.
 
 ## What this does and does not buy you
 
-It does **not** verify a running system — there is no implementation. It model-checks the
-*design's stated abstraction* (atomic CAS, the rate rule, the recovery sequence). So it
-raises confidence in the design's internal logic, from a decorrelated source; it says
-nothing about code that doesn't exist (per [`FAILURE-MODES.md`](FAILURE-MODES.md) W1:
-convergence is not correctness, and a model is not the territory).
+It model-checks the *design's stated abstraction* (atomic CAS, the rate rule, the
+revoke/terminate sequence with a per-row loop) — not a running system, which doesn't
+exist. So it raises confidence in the design's internal logic, from a source decorrelated
+in execution but not in agenda. Per [`FAILURE-MODES.md`](FAILURE-MODES.md): convergence is
+not correctness, a model is not the territory, and a checker handed the panel's own claims
+cannot test for the things the panel never thought to check. Within those limits it does
+the one thing the four LLM lenses structurally could not: ask the world what happens
+instead of asking the model what it thinks — on the claims someone already chose to make.
 
-But that is exactly the move the synthesis calls for, made concrete: where the document
-makes a claim you can execute, stop asking the model what it thinks and ask the world
-what happens. This is the repo eating its own most important conclusion — one lens, but
-the right *kind* of lens, and the one the other six structurally could not be.
+## The one finding
+
+- **ADVISORY §2.2** — the ceiling of 5 is slack: the computed maximum live count is 3.
+  Not a defect — the spec frames the 5 as a belt-and-suspenders guard against a future
+  rate-limit relaxation — so a slack cap today is intended. Logged, same disposition as
+  the round-4 advisory it reproduces.

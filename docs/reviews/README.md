@@ -121,7 +121,9 @@ different roles. Be clear-eyed about what that does and doesn't buy you:
   critics" here means independent *prompts and contexts*, not independent minds.
 
 So the loop is a strong forcing function against carelessness, not a guarantee of
-correctness. For higher assurance, diversify the *intelligences*, not just the
+correctness — and note you can never measure what it *missed*: you see the findings it
+surfaces, never the false negatives, so "converged" reports precision and is silent on
+recall. For higher assurance, diversify the *intelligences*, not just the
 prompts: use different model families per lens, put a human on the arbiter seat (the
 role where shared blind spots do the most damage), or have the author and the critics
 be different models. The protocol is the same; only the cast changes.

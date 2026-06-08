@@ -31,6 +31,11 @@ document; you're subtracting from the pile of things still wrong with it.
 
 ## What's in here
 
+> **New here?** Read the protocol (`docs/reviews/README.md`) and `round-001.md` — that's
+> the whole technique. Everything below the rounds (RUN-LOG, FAILURE-MODES,
+> EXECUTABLE-CRITIC) is an optional deep-dive on cost, epistemics, and decorrelated
+> checking; skip it and you still have the method.
+
 - [`docs/design/magic-link-auth.md`](docs/design/magic-link-auth.md) — the target
   document, versioned (v0.1 → v0.6, changelog at the bottom).
 - [`docs/reviews/README.md`](docs/reviews/README.md) — the protocol: panel, findings
@@ -46,7 +51,7 @@ document; you're subtracting from the pile of things still wrong with it.
 - [`docs/reviews/EXECUTABLE-CRITIC.md`](docs/reviews/EXECUTABLE-CRITIC.md) +
   [`scripts/executable_critic.py`](scripts/executable_critic.py) — a non-LLM lens that
   *runs*: model-checks three v0.6 claims (with negative controls), the one critic the
-  other six structurally couldn't be.
+  other four structurally couldn't be.
 - [`.claude/agents/`](.claude/agents/) + [`.claude/commands/`](.claude/commands/) —
   wiring to run a round in one command.
 - [`scripts/check-consistency.sh`](scripts/check-consistency.sh) — audits the trail's

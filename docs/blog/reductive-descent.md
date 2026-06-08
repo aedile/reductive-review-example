@@ -14,8 +14,9 @@ remain, the way gradient descent shrinks an error term. You're not adding to the
 document. You're subtracting from the pile of things still wrong with it.
 
 If the "iterate toward a goal until it converges" shape feels familiar, it should:
-it's the same loop Andrej Karpathy's *autoresearch* uses for machine-learning
-experiments — an agent edits one training script, runs a time-boxed experiment,
+it's the same loop Andrej Karpathy's *autoresearch*
+([github.com/karpathy/autoresearch](https://github.com/karpathy/autoresearch)) uses for
+machine-learning experiments — an agent edits one training script, runs a time-boxed experiment,
 measures the result against a metric, and keeps or reverts the change, all night.
 Reductive review points that loop at a document instead of a training run, with a
 panel of adversaries standing in for the metric. The credit for naming and
@@ -33,8 +34,9 @@ each with its own standing brief and angle of attack, reviewing the same documen
 parallel. They're hostile by construction: their job is to find what's wrong, not to
 be helpful. A security adversary hunts takeover paths; a systems engineer hunts what
 breaks under load; a product reviewer hunts the users who get stuck; a skeptical
-generalist attacks the premise itself. One reviewer has one blind spot. Several have
-overlapping coverage and no shared blind spot.
+generalist attacks the premise itself. One reviewer has one blind spot. Several lenses
+have overlapping coverage and a *smaller* shared blind spot — though, as you'll see
+later, a same-model panel never gets that shared blind spot all the way to zero.
 
 **2. A structured findings taxonomy.** Every critic returns findings in a fixed
 format, graded by severity — BLOCKER / FINDING / ADVISORY — each tied to a section.
@@ -129,7 +131,7 @@ descent.
 |---|---|---|
 | **Direction** | Additive — keeps producing | Reductive — drives objections toward zero |
 | **Reviewers** | One generic agent, one prompt | Several specialized adversarial lenses |
-| **Critique** | Implicit; self-judged next pass | Explicit, externalized, graded by independent critics |
+| **Critique** | Implicit; self-judged next pass | Explicit, externalized, graded by separate adversarial lenses |
 | **Conflict** | None — single voice | An arbiter resolves and records why |
 | **Termination** | Emergent; a human kills it | Formal: unanimous "nothing material left" |
 | **Audit trail** | The diff is the only record | Every round versioned |

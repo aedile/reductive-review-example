@@ -3,6 +3,13 @@
 > Fictional teaching artifact. This spec began intentionally insecure (v0.1) and was
 > hardened across six recorded review rounds to convergence. Even at v0.6 it is a
 > worked example, not a production design. **Do not implement.**
+>
+> *A note on the density below: this is what "converged" output actually looks like —
+> dense, qualified, cross-referenced, written to survive critics. That is partly the
+> point (every clause earned its place against a finding) and partly a visible cost
+> (the very Goodhart failure the protocol warns about — armoring against objections can
+> crowd out plain clarity). Read it as an artifact of the process, not a style to
+> emulate; a real spec would refactor for a reader after converging for the critics.*
 
 ## §1 Goal and scope
 
@@ -23,7 +30,7 @@ moving part for the common case. Passkeys/OTP are reasonable alternatives, not p
 **Success criteria (acceptance bar):** median time-to-logged-in < 60 s; login
 completion rate ≥ 95% for deliverable addresses; email delivery SLA p95 < 30 s;
 lockout/support-ticket rate < 0.1% of sign-ins. **Abandon/escalate conditions:**
-completion rate < 90% after delivery and resend are addressed reconsiders the
+completion rate < 90% after delivery and resend are addressed triggers a review of the
 passwordless premise; lockout/support rate breaching 0.1% for 3 consecutive periods
 escalates a recovery-path review (the metric that measures whether the recovery design
 works must itself gate something).

@@ -54,11 +54,14 @@ Ensemble theory: the variance of an averaged estimator falls with the *number of
 independent* members, but correlation erodes that — correlated weak learners buy you
 less than their count suggests. Four instances of one model share priors, so they
 share some blind spots.
-- **Well, actually:** correlation is **measurable** (run the panel, compute how often
-  the critics' findings overlap) and it is empirically **< 1** — in this repo's own run
-  the four lenses surfaced materially different findings. So effective independence is
-  *less than 4 but decisively more than 1.* "Echo chamber" overstates it; "partially
-  correlated panel" is right.
+- **Well, actually — but this is the easy version of the claim, and it's wrong:**
+  correlation that *matters* for ensemble theory is correlation of *errors* (shared
+  false negatives), and by W2 those are unobservable. This repo's run showed the four
+  lenses surfacing *different findings*, but that measures division of labor (each lens
+  looks at a different facet), **not** shared blind spots — it is guaranteed by giving
+  them different briefs and says nothing about what they all miss together. We did **not**
+  measure error correlation. The honest claim is only "outputs differed," which is
+  weaker than "effective independence > 1." *(Intuition, not measurement.)*
 - **What we do:** the real decorrelator is a **different *kind* of checker**, not a
   different LLM vendor (see the note on model diversity below). Add verifiers that share
   *no* training data with the model: executable tests, type checkers, fuzzers, model
@@ -70,12 +73,13 @@ Models drift toward agreement and praise; this is trained-in, not incidental (Sh
 et al., *Towards Understanding Sycophancy in Language Models*, 2023; Perez et al.,
 *Model-Written Evaluations*, 2022). Left unchecked, late rounds bias toward "looks
 good."
-- **Well, actually:** agreement theater has two drivers — (a) **shared context** /
-  seeing the prior agreement, and (b) a weight-level RLHF pull. Running critics in
-  **separate contexts with hostile mandates** removes (a), which is the dominant one.
-  (b) is a weaker residual that prompt-perturbation and "default to refuted" framing
-  blunt. So the design choice already addresses most of this — it is not an unanswered
-  objection.
+- **Well, actually:** agreement theater has at least two drivers — (a) **shared context**
+  / seeing the prior agreement, and (b) a weight-level RLHF pull. Running critics in
+  **separate contexts with hostile mandates** removes (a), and prompt-perturbation and
+  "default to refuted" framing blunt (b). *Which driver dominates is our intuition, not a
+  measurement* — we have not isolated (a) vs (b), so "removes most of it" is a claim we
+  can't back, only a design bet. The grounded part is that the existence of sycophancy is
+  documented; the efficacy of these mitigations against it, here, is unmeasured.
 - **What we do:** blind contexts per critic, adversarial prompts, perturbation every
   round after the first, and require each "closed" finding to be *proven* against the
   text, not asserted.
@@ -110,11 +114,16 @@ verifier–generator gap "collapses" under one model. It does not.)*
   isn't worthless. The narrower real result, *LLMs Cannot Self-Correct Reasoning Yet*
   (Huang et al., 2023), finds that self-correction **with no new information** fails or
   degrades. The key is the condition: *no new information.*
-- **Well, actually:** a critic with a different mandate, a fresh context, and a hostile
-  frame is **new conditioning** — it routes the same weights down a different
-  computation and never sees the author's reasoning. That is precisely *not* the
-  context-free self-rereading that's known to be weak. So the honest claim is
-  correlation, not collapse.
+- **Well, actually — and here is the equivocation to watch, including in our own
+  earlier draft:** a critic with a different mandate and a fresh context is **new
+  conditioning** (a different prompt), but Huang et al.'s failure condition is **no new
+  *information*** (no external oracle/label). A re-prompted instance of the *same frozen
+  weights* with no external signal supplies new conditioning, not new information about
+  the world — so a hostile reframe does **not** obviously escape Huang's result. That it
+  does is **our hypothesis, untested (n=1)**, not something the cited paper grants us.
+  The only thing in this repo that supplies genuinely new information is the executable
+  critic (an external computation). Honest claim: correlation, not collapse — and the
+  "fresh context beats self-critique" mitigation is a bet, not a result.
 - **What we do:** convert opinions into executable facts wherever possible (the only
   thing that fully leaves the model's epistemic basis), and decorrelate with non-LLM
   and human checkers (W3).
@@ -124,17 +133,18 @@ verifier–generator gap "collapses" under one model. It does not.)*
 ## Chaff — intuitions and hard opinions
 
 ### C1. "Subtraction converges to *unobjectionable*, never *excellent*"
-Sounds like a theorem; it is not.
-- **Well, actually:** if a lens's mandate is "object to anything mediocre, unoriginal,
+**Honest correction (this was misfiled as chaff): the objection's kernel survives — it
+is closer to wheat.** Only the *absolute phrasing* ("can't *reach* excellence") was chaff.
+- **The chaff part:** if a lens's mandate is "object to anything mediocre, unoriginal,
   or that fails to delight," then *not excellent* becomes a finding and gets minimized
-  like any other. The wall isn't fundamental — it's whether your panel **has an ambition
-  lens.** Without one you converge to unobjectionable; with one you can push higher.
-- **Refined (the defensible kernel):** subtraction can *demand* excellence (flag its
-  absence) but cannot *generate* the specific creative content that satisfies the
-  demand — that still needs an additive/generative pass. So: reductive review raises the
-  floor toward "unobjectionable *by your lenses*"; raising the ceiling needs a quality
-  lens **and** a generative step. The original "subtraction can't reach excellence" was
-  too strong.
+  like any other. So the wall isn't *absolute* — it depends on whether your panel has an
+  ambition lens.
+- **The kernel that survives (don't pretend it didn't):** subtraction can *demand*
+  excellence (flag its absence) but cannot *generate* the creative content that satisfies
+  the demand — that needs an additive/generative pass the loop structurally lacks. So
+  reductive review raises the floor toward "unobjectionable *by your lenses*"; the ceiling
+  needs a quality lens **and** a generative step. Calling the whole objection "chaff" was
+  a motte-and-bailey on our part; the real status is "true, with a fixable half."
 
 ### C2. "Local minima — you can only descend in the subspace your critics span"
 The gradient-descent framing is an **analogy**, not mathematics. The objection surface
@@ -178,7 +188,11 @@ review when they are limits on **all** review.
 
 - **The criterion problem / underdetermination.** "Material" has no external definition
   except what the panel stops objecting to — so "good enough" is defined by the process
-  meant to measure it.
+  meant to measure it. *(Caveat: this one is only **partly** universal. An executable
+  test or a formal property has a criterion external to the reviewer — it holds or it
+  doesn't — so panel-defined "material" is **more** circular than spec-defined
+  correctness. This is a **differential** weakness of LLM-panel review, and it is exactly
+  what the executable critic escapes. We shouldn't have filed it as fully shared.)*
 - **The Münchhausen trilemma.** Why trust the arbiter? Every justification bottoms out
   in circularity, infinite regress, or an axiom. Here the axiom is "the arbiter's call."
 - **Consensus ≠ truth.** Agents agreeing is a social fact, not a truth-maker.
@@ -191,10 +205,11 @@ review when they are limits on **all** review.
 expert panel, to peer review, and — via unproven axioms and a trusted checker — even to
 formal verification. They are the epistemic ceiling for *any* process that decides "this
 is good enough." They do not make reductive review *worse* than the alternatives; they
-make it **honest about a ceiling everyone shares.** And on the things that are actually
-comparable — a written criterion (graded findings), an explicit arbiter-of-record, a
-versioned audit trail, a stated termination signal — this method sits *above* one-shot
-review, not below it.
+make it **honest about a ceiling everyone shares.** On the **auditability** axes — a
+written criterion (graded findings), an explicit arbiter-of-record, a versioned audit
+trail, a stated termination signal — this method sits above one-shot review. That is a
+claim about *legibility, not correctness*: a fully-auditable process can still be wrong
+(recall is unobservable, W2). "Above on the paperwork" is the most it earns here.
 
 - **What we do:** keep the language humble ("converged" = "no material objection
   survived," never "correct"); ground the criterion externally wherever possible
@@ -213,9 +228,14 @@ type, a fuzzer, a proof, a human. The highest-leverage move in this whole docume
 stop asking the model what it thinks and start asking the world what happens — to convert
 judgment into computation wherever the document makes a claim you can execute.
 
-This repo does that, so the claim isn't just asserted: [`EXECUTABLE-CRITIC.md`](EXECUTABLE-CRITIC.md)
-is a non-LLM model-checker ([`scripts/executable_critic.py`](../../scripts/executable_critic.py))
-that tests three v0.6 claims by computation. It corroborated the design from a fully
-decorrelated source, *computed* the live-token maximum the panel had only argued (3, not
-5), and its negative controls reproduce the earlier recovery-ordering bug (F19) — proof
-that a checker which runs catches what reasoning asserts.
+This repo makes a start on that, with the honest scoping it deserves:
+[`EXECUTABLE-CRITIC.md`](EXECUTABLE-CRITIC.md) is a non-LLM model-checker
+([`scripts/executable_critic.py`](../../scripts/executable_critic.py)) that tests three
+v0.6 claims by genuinely enumerating interleavings (with negative controls that trip, so
+the checks can fail). It is decorrelated at the **execution** layer, **not** in agenda —
+its constants and properties were transcribed from the spec and the panel's own findings,
+so it can only test what someone already thought to check and **cannot catch a shared
+blind spot**. Within that limit it computes the live-token maximum the panel had only
+argued, and shows atomicity and revoke-ordering are load-bearing by breaking them on
+demand. That is real corroboration from a different *kind* of checker — not independent
+proof of correctness, and not a source free of the panel's priors.
