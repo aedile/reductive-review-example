@@ -1,0 +1,6 @@
+# Build scaffolding that is not part of the published example
+prompt.md
+stara-cognitive/
+
+# OS / editor cruft
+.DS_Store
