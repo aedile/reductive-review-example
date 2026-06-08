@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Executable Critic — a non-LLM lens on docs/design/magic-link-auth.md (v0.6).
+Executable Critic, a non-LLM lens on docs/design/magic-link-auth.md (v0.6).
 
 It tests three claims by computation/model-checking, not by reasoning. It is
 decorrelated from the LLM panel at the *execution* layer (Python vs. token
 prediction). It is NOT decorrelated in *agenda*: a human/model transcribed these
 constants and properties from the spec and the panel's findings, so it can only test
-claims someone already thought to make — it cannot find a flaw no lens looked for.
+claims someone already thought to make, it cannot find a flaw no lens looked for.
 
 Each check enumerates genuine interleavings and ships a negative control that the SAME
 engine must flag, so a PASS is not true-by-construction:
@@ -21,7 +21,7 @@ engine must flag, so a PASS is not true-by-construction:
   3. §7.2  recovery. revoke-all modeled as a per-row loop, terminate as snapshot-
            then-kill, the attacker's consume (CAS+mint, atomic per §3.2) interleaved
            at every step. Control: if mint is NOT atomic with consume, even v0.6 breaks
-           — showing that "mint is part of the consume" is load-bearing.
+showing that "mint is part of the consume" is load-bearing.
 
 Run: python3 scripts/executable_critic.py   (stdlib only; exit 0 if v0.6 holds)
 """
@@ -50,7 +50,7 @@ def interleavings(sequences):
 
 
 # ---------------------------------------------------------------------------
-# Check 1 — §2.2/§2.1 : maximum simultaneously-live tokens (real packing search)
+# Check 1: §2.2/§2.1 : maximum simultaneously-live tokens (real packing search)
 # ---------------------------------------------------------------------------
 def max_concurrent_live(rate_count, rate_window, ttl):
     """Maximum tokens live at one instant. A token minted at t is live on [t, t+ttl);
@@ -81,20 +81,20 @@ def check_concurrency_cap():
             f"Packing search: the maximum simultaneously-live token count under the §2.1 "
             f"rate limit (<= {RATE_LIMIT_COUNT}/{RATE_WINDOW_MIN}min) and the §3.2 "
             f"{TOKEN_TTL_MIN}min expiry is {actual}. The cap of {DECLARED_CAP} never binds "
-            f"today — consistent with the spec calling it a belt-and-suspenders guard. "
+            f"today, consistent with the spec calling it a belt-and-suspenders guard. "
             f"(The search is real: in a {3}/5min, 15min-ttl regime it returns {control}.)",
         ))
     return {
         "name": "Concurrency cap (§2.2/§2.1)",
         "computed_max_live": actual,
-        "control_ttl_gt_window": control,            # must be > DECLARED_CAP to have teeth
+        "control_ttl_gt_window": control, # must be > DECLARED_CAP to have teeth
         "negative_control_breaches_cap": control > DECLARED_CAP,
         "findings": findings,
     }
 
 
 # ---------------------------------------------------------------------------
-# Check 2 — §3.2 : single-use under genuine read/write interleaving
+# Check 2: §3.2 : single-use under genuine read/write interleaving
 # ---------------------------------------------------------------------------
 OPS = [("consume", "consumed"), ("revoke", "revoked"), ("expire", "expired")]
 
@@ -141,15 +141,15 @@ def check_state_machine():
         ))
     return {
         "name": "State machine single-use (§3.2)",
-        "atomic_winner_counts": sorted(atomic_counts),         # expect [1]
-        "nonatomic_winner_counts": sorted(nonatomic_counts),   # expect to include >1
+        "atomic_winner_counts": sorted(atomic_counts), # expect [1]
+        "nonatomic_winner_counts": sorted(nonatomic_counts), # expect to include >1
         "negative_control_double_spends": any(c > 1 for c in nonatomic_counts),
         "findings": findings,
     }
 
 
 # ---------------------------------------------------------------------------
-# Check 3 — §7.2 : recovery vs an attacker consuming mid-recovery
+# Check 3: §7.2 : recovery vs an attacker consuming mid-recovery
 # ---------------------------------------------------------------------------
 def recovery_unsafe(order, atomic_mint):
     """order: 'revoke_first' (v0.6) or 'terminate_first' (v0.5).
@@ -212,8 +212,8 @@ def check_recovery_ordering():
     return {
         "name": "Recovery ordering (§7.2)",
         "v06_revoke_then_terminate_safe": not v06,
-        "v05_terminate_then_revoke_unsafe": v05,            # reproduces round-5 F19
-        "async_mint_breaks_even_v06": async_mint_v06,       # control: why atomic mint matters
+        "v05_terminate_then_revoke_unsafe": v05, # reproduces round-5 F19
+        "async_mint_breaks_even_v06": async_mint_v06, # control: why atomic mint matters
         "findings": findings,
     }
 
@@ -224,7 +224,7 @@ def main():
     all_findings = [f for c in checks for f in c["findings"]]
 
     print("=" * 72)
-    print("EXECUTABLE CRITIC — non-LLM verification of magic-link-auth.md v0.6")
+    print("EXECUTABLE CRITIC, non-LLM verification of magic-link-auth.md v0.6")
     print("=" * 72)
 
     c1 = checks[0]
@@ -245,13 +245,13 @@ def main():
     print(f"\n[3] {c3['name']}")
     print(f"    v0.6 revoke-then-terminate safe over all interleavings: {c3['v06_revoke_then_terminate_safe']}")
     print(f"    v0.5 terminate-then-revoke unsafe (reproduces round-5 F19): {c3['v05_terminate_then_revoke_unsafe']}")
-    print(f"    control — async mint (not fused with consume) breaks even v0.6: {c3['async_mint_breaks_even_v06']}")
+    print(f"    control, async mint (not fused with consume) breaks even v0.6: {c3['async_mint_breaks_even_v06']}")
 
     print("\n" + "-" * 72)
     if all_findings:
         print("FINDINGS (graded, located):")
         for sev, sec, title, body in all_findings:
-            print(f"\n  [{sev}] {sec} — {title}\n    {body}")
+            print(f"\n  [{sev}] {sec}, {title}\n    {body}")
     else:
         print("No BLOCKER/FINDING against v0.6.")
 
@@ -263,7 +263,7 @@ def main():
 
     blocking = [f for f in all_findings if f[0] in ("BLOCKER", "FINDING")]
     print("\nVERDICT:", "v0.6 claims hold under model-checking." if not blocking
-          else "v0.6 violation found — see findings.")
+          else "v0.6 violation found, see findings.")
     if not teeth:
         print("WARNING: a negative control failed to trip; treat PASSes as unproven.")
     return 1 if blocking else 0

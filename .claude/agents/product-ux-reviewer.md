@@ -14,5 +14,5 @@ protocol in `docs/reviews/README.md` exactly.
   to a §, plus a Summary that ends by stating whether another round is warranted or
   whether you have nothing material to add).
 - Be hostile by construction: hunt for the unhappy paths, the excluded users, and the
-  undefined states — not style preferences. Other critics cover other lenses.
+  undefined states, not style preferences. Other critics cover other lenses.
 - Write your findings to `docs/reviews/rounds/round-NNN/product.md`.

@@ -1,4 +1,4 @@
-# Product / UX — Round 006
+# Product / UX: Round 006
 
 Reviewing `docs/design/magic-link-auth.md` at **v0.6**. Fresh full read.
 Perturbation honored: started from §6.1 split error-state copy and the §5.0
@@ -7,7 +7,7 @@ multi-email confirmation line, then the rest of the user surface.
 ## Verification of the round-005 FINDING (closed)
 
 My round-005 FINDING was that the single **"already used"** state mislabelled a
-recovery-revoked link — a user who had just completed account recovery and then
+recovery-revoked link, a user who had just completed account recovery and then
 clicked an old link would read "used" as "someone else used my link" and panic.
 
 v0.6 §6.1 splits the copy into two distinct states:
@@ -15,7 +15,7 @@ v0.6 §6.1 splits the copy into two distinct states:
 - **"already used"** is now scoped to "a token *this user consumed*."
 - **"revoked by recovery"** is a *distinct* state with its own neutral copy:
   "for your security, links from before your recent account recovery no longer
-  work — request a fresh one," explicitly "never labelled 'used,' which for a
+  work, request a fresh one," explicitly "never labelled 'used,' which for a
   recovery-completing user would falsely read as 'someone used my link.'"
 
 This is exactly the resolution the finding called for, and the rationale is
@@ -52,7 +52,7 @@ None.
 - §5.0 ↔ §2.2: multi-email confirmation copy is consistent with the
   multiple-concurrent-token / "any link works" model. No dangling references.
 - §6.0 ↔ §5.0: cross-device flow, confirm-then-POST consumption, "signed in on
-  another device — you can close this tab," and success landing are all defined
+  another device, you can close this tab," and success landing are all defined
   and mutually consistent.
 
 ## Summary
@@ -60,8 +60,8 @@ The round-005 FINDING is genuinely closed: the error-state copy is split so a
 recovery-revoked link gets its own neutral "revoked by recovery" message and is
 never mislabelled "already used," and the §5.0 multi-email confirmation line is
 in place and coherent with the no-invalidation model. The v0.6 copy edits
-introduced no new UX problem — the revoked-by-recovery wording is only ever shown
+introduced no new UX problem, the revoked-by-recovery wording is only ever shown
 on a path that actually produced a recovery. The user surface (cross-device,
 "didn't get the email," accessibility, trust signals, error/empty/edge states)
 is complete with no material gap remaining. **No further round is warranted from
-the Product / UX lens — I have nothing material to add.**
+the Product / UX lens, I have nothing material to add.**

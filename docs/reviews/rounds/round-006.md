@@ -1,4 +1,4 @@
-# Round 006 — Arbiter Aggregate
+# Round 006: Arbiter Aggregate
 
 - **Document:** `docs/design/magic-link-auth.md` @ **v0.6**
 - **Panel (frozen):** Security Adversary, Systems Engineer, Product/UX, Skeptical Generalist
@@ -34,7 +34,7 @@ part of this example:
 - **R005→R006:** v0.6's surgical fixes closed both and introduced nothing.
 
 Four of the six rounds saw a fix create the next round's headline issue. A one-shot
-review — or a descent that stopped at the first "looks better" — would have shipped
+review, or a descent that stopped at the first "looks better", would have shipped
 one of those regressions. The loop is what caught them.
 
 ## Anti-rubber-stamp check (why this convergence is trustworthy)
@@ -43,7 +43,7 @@ A collapse to zero is exactly the moment to distrust, so the arbiter did not acc
 "nothing to add" on assertion:
 
 - Each critic **proved** its closures against specific v0.6 text and re-derived from a
-  fresh read — Systems traced the revoke-then-terminate ordering and re-confirmed the
+  fresh read, Systems traced the revoke-then-terminate ordering and re-confirmed the
   consume CAS; Product confirmed the `revoked` copy split is account-existence-neutral;
   Security re-derived that revoking-first fences the gap; the Skeptic swept the seams.
 - Prompts were perturbed for the sixth straight round, so no critic could pattern-match
@@ -58,13 +58,13 @@ A collapse to zero is exactly the moment to distrust, so the arbiter did not acc
 |---|-----|-------|-----------|
 | A30 | §2.2/§3.2 | Forward-looking guardrails: keep the cap/rate-limit relationship and the linearizable-CAS explicit if these sections are ever edited | Security |
 | A31 | §7.2 | A second guardrail note on preserving the revoke-before-terminate ordering under future refactors | Security |
-| A32 | §6.1/§7.2 | A link requested moments before a recovery completes is correctly revoked but yields a generic "request again" loop with no recovery-aware explanation — minor post-recovery UX edge | Skeptic |
+| A32 | §6.1/§7.2 | A link requested moments before a recovery completes is correctly revoked but yields a generic "request again" loop with no recovery-aware explanation, minor post-recovery UX edge | Skeptic |
 
 ## Arbiter decision
 
 - **No revisions required.** v0.6 stands as the converged version.
-- **A30–A32 logged** as deferred polish; none is material per the protocol's
+- **A30-A32 logged** as deferred polish; none is material per the protocol's
   definitions (worth noting, may defer without harm).
 - **Descent closed at round 006.** The panel is unfrozen. Exit signal met: zero
-  BLOCKERs, zero FINDINGs, 4/4 critics independently reporting nothing material — each
+  BLOCKERs, zero FINDINGs, 4/4 critics independently reporting nothing material, each
   having proven, not assumed, that the prior round's items are closed.

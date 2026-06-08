@@ -12,51 +12,51 @@ a fancier one-shot review.
 Several distinct adversarial critics, each with a standing brief in `prompts/`,
 each reviewing the **same document version in parallel**. Critics are hostile by
 construction: their job is to find what is wrong, not to be helpful or balanced.
-This example uses four lenses — Security Adversary, Systems Engineer, Product/UX,
-and Skeptical Generalist — but the panel is per-domain, not fixed.
+This example uses four lenses, Security Adversary, Systems Engineer, Product/UX,
+and Skeptical Generalist, but the panel is per-domain, not fixed.
 
 Freeze the panel for the duration of a descent. Changing the panel starts a new
 run and resets the convergence signal.
 
 ## 2. The findings format (required of every critic)
 
-Every finding is **graded** and **located**. No free-form prose review — graded,
+Every finding is **graded** and **located**. No free-form prose review, graded,
 located findings are what let you measure progress across rounds.
 
 ```
 ## BLOCKER  (must fix before the doc can be trusted)
-### §<section> — <short title>
+### §<section>: <short title>
 - Problem: <what's wrong>
 - Why it matters: <stakes>
 - Suggested resolution: <concrete path forward>
 
 ## FINDING  (substantive; should fix)
-### §<section> — <short title>
+### §<section>: <short title>
 - Problem / Why it matters / Suggested resolution
 
 ## ADVISORY (worth noting; may defer)
-### §<section> — <short title>
+### §<section>: <short title>
 - Problem / Why it matters / Suggested resolution
 
 ## Cross-section coherence flags
 - Contradictions, dangling references, sections that disagree with each other.
 
 ## Summary
-- 2–3 sentences. MUST end by stating explicitly whether another round would be
+- 2-3 sentences. MUST end by stating explicitly whether another round would be
   valuable, or whether you have nothing material to add.
 ```
 
 Severity definitions, applied consistently:
 
-- **BLOCKER** — the document cannot be trusted until this is fixed. Ship-stopping.
-- **FINDING** — substantive; should be fixed, but does not by itself invalidate
+- **BLOCKER**: the document cannot be trusted until this is fixed. Ship-stopping.
+- **FINDING**: substantive; should be fixed, but does not by itself invalidate
   the document.
-- **ADVISORY** — worth noting; may be deferred without harm.
+- **ADVISORY**: worth noting; may be deferred without harm.
 
 ## 3. The arbiter
 
 The critics review independently; one **arbiter** then aggregates. When critics
-disagree — and they will — the arbiter decides what gets acted on and records
+disagree, and they will, the arbiter decides what gets acted on and records
 **why** in the round's aggregate file. Disagreement is resolved and logged, not
 silently averaged. The arbiter also de-duplicates: two critics flagging the same
 issue from different angles is one finding, attributed to both.
@@ -70,7 +70,7 @@ trail. Never hand-edit the target doc outside a round's recorded decisions.
 ## 5. Termination
 
 Stop when **every critic independently reports "nothing material to add."**
-Convergence is the exit signal — not fatigue, not a round budget, not the human
+Convergence is the exit signal, not fatigue, not a round budget, not the human
 losing patience. A single residual ADVISORY does not block convergence; an open
 FINDING or BLOCKER does.
 
@@ -81,10 +81,10 @@ output is kept in `rounds/round-NNN/`, every arbiter decision in `rounds/round-N
 and the **timing and token cost of every agent run** in
 [`RUN-LOG.md`](RUN-LOG.md). And because counted findings are only as trustworthy as
 their bookkeeping, [`scripts/check-consistency.sh`](../../scripts/check-consistency.sh)
-audits the trail itself — every per-critic count in the RUN-LOG against the actual
+audits the trail itself, every per-critic count in the RUN-LOG against the actual
 graded entries, the README's descent table against each round's aggregate, and every
 §-citation against the design doc. Run it after any edit. Keep it that way: never run
-the loop on content you can't publish, and when you can, publish the whole trail — the
+the loop on content you can't publish, and when you can, publish the whole trail, the
 slow rounds and the regressions included. (Secret or internal documents are exactly what
 *not* to run this on in public.)
 
@@ -100,11 +100,11 @@ edge cases returns "looks good, no notes." Defend against it every round:
   the panel cannot pattern-match its own previous output.
 - **Treat a sudden collapse to zero with suspicion, not celebration.** A panel that
   found ten things last round and zero this round either did great work or quit.
-  The arbiter must make it prove which — by pointing at the specific revisions that
+  The arbiter must make it prove which, by pointing at the specific revisions that
   resolved each prior item, not by asserting resolution.
 - **Don't let "advisory" mean "ignore."** Re-grading a finding down to advisory is
   legitimate, but the arbiter records it and decides explicitly whether to fix or
-  defer — softening severity is not the same as resolving the issue.
+  defer, softening severity is not the same as resolving the issue.
 
 ## The honest limitation: one model wearing many hats
 
@@ -112,23 +112,23 @@ In the worked example in this repo, the four critics, the arbiter, **and the aut
 who wrote every document revision are all the same model**, just prompted into
 different roles. Be clear-eyed about what that does and doesn't buy you:
 
-- It **does** give you a separation of *concerns* and diverse *perspectives* — the
+- It **does** give you a separation of *concerns* and diverse *perspectives*, the
   security lens and the product lens genuinely surface different findings, as the
   round files show.
 - It **does not** give you independent *intelligences*. Four instances of one model
   share its blind spots: a misconception baked into the model is one the whole panel
-  can inherit, and the arbiter — same model — may not catch it either. "Independent
+  can inherit, and the arbiter, same model, may not catch it either. "Independent
   critics" here means independent *prompts and contexts*, not independent minds.
 
 So the loop is a strong forcing function against carelessness, not a guarantee of
-correctness — and note you can never measure what it *missed*: you see the findings it
+correctness, and note you can never measure what it *missed*: you see the findings it
 surfaces, never the false negatives, so "converged" reports precision and is silent on
 recall. For higher assurance, diversify the *intelligences*, not just the
 prompts: use different model families per lens, put a human on the arbiter seat (the
 role where shared blind spots do the most damage), or have the author and the critics
 be different models. The protocol is the same; only the cast changes.
 
-This is the short version. The long version — local minima, Goodhart, unobservable
+This is the short version. The long version, local minima, Goodhart, unobservable
 recall, consensus-isn't-truth, and which of those are *grounded* vs. *just plausible*
-— is in [`FAILURE-MODES.md`](FAILURE-MODES.md), sorted into what the evidence supports
+is in [`FAILURE-MODES.md`](FAILURE-MODES.md), sorted into what the evidence supports
 and what is honest intuition.

@@ -1,4 +1,4 @@
-# Skeptical Generalist — Round 003
+# Skeptical Generalist: Round 003
 
 Target: `docs/design/magic-link-auth.md` (v0.3)
 
@@ -11,10 +11,10 @@ specialists each assume someone else checks.
 
 Prior BLOCKER: §7.2 recovery enrolment was conditional ("an account *needing* a
 fallback **must** enrol"), so the default user who never enrolled was still
-lockable-out by construction — the headline round-001 lockout, named but not closed.
+lockable-out by construction, the headline round-001 lockout, named but not closed.
 
-v0.3 §7.2 now reads: a recovery method "is **mandatory at account creation** — no
-account exists without one — so the default user is not lockable-out by omission."
+v0.3 §7.2 now reads: a recovery method "is **mandatory at account creation**: no
+account exists without one, so the default user is not lockable-out by omission."
 The conditional "needing a fallback" language is gone; this adopts my suggested
 resolution (a) verbatim in intent. I tried to re-open the by-omission lockout and
 **cannot**: under this text there is no account without a recovery channel, so the
@@ -33,9 +33,9 @@ None. The round-002 BLOCKER is genuinely closed, not merely renamed.
 
 ## FINDING
 
-### §7.2 / §1 — The lockout fix is enforced entirely inside a process §1 declares out of scope
+### §7.2 / §1: The lockout fix is enforced entirely inside a process §1 declares out of scope
 - Problem: The single load-bearing sentence that closes the lockout BLOCKER is "a
-  recovery method ... is **mandatory at account creation** — no account exists
+  recovery method ... is **mandatory at account creation**: no account exists
   without one." But §1 lists "account creation" under **Out of scope**. So the
   invariant the whole §7 recovery story rests on ("no account exists without a
   recovery channel") is asserted by this doc but enforced by a process this doc
@@ -43,7 +43,7 @@ None. The round-002 BLOCKER is genuinely closed, not merely renamed.
   actually holds at runtime; it is a precondition imported from elsewhere and then
   relied on as if proven here. Relatedly, the present-tense invariant says nothing
   about accounts that predate the requirement (legacy/migrated accounts with no
-  recovery channel) — whether they are blocked, back-filled, or grandfathered into
+  recovery channel), whether they are blocked, back-filled, or grandfathered into
   the old lockout is undefined.
 - Why it matters: This is exactly the seam my lens is for: Security treats "recovery
   is mandatory" as a given and threat-models forward from it; Product/Systems treat
@@ -59,7 +59,7 @@ None. The round-002 BLOCKER is genuinely closed, not merely renamed.
   line on legacy/no-recovery accounts: either they cannot authenticate until a
   channel is enrolled, or they are an explicitly accepted, owned lockout class.
 
-### §2.2 / §3.2 / §5.0 — Single-live-token invariant, session-scoped supersession, and resend collide for the lost-tab user
+### §2.2 / §3.2 / §5.0: Single-live-token invariant, session-scoped supersession, and resend collide for the lost-tab user
 - Problem: Three stated properties do not compose cleanly. §3.2: "**at most one live
   token exists per account.**" §2.2: supersession is "**scoped to the originating
   session** ... a request that does not carry the original request's session context
@@ -70,7 +70,7 @@ None. The round-002 BLOCKER is genuinely closed, not merely renamed.
   the 10-minute token expiry, re-requests from a fresh session. That request (a)
   cannot supersede (no originating-session context, by §2.2's anti-targeting rule),
   and (b) is outside the coalesce window, so what happens is undefined: either a
-  second live token is minted — **violating §3.2's "at most one" invariant** — or the
+  second live token is minted, **violating §3.2's "at most one" invariant**: or the
   request is dropped/refused, **stranding a legitimate user** who is now waiting on an
   email they may not be able to retrieve, with no in-scope way to get a fresh link.
 - Why it matters: The §2.2 session-scoping was introduced to stop a *third party*
@@ -79,7 +79,7 @@ None. The round-002 BLOCKER is genuinely closed, not merely renamed.
   (closed tab, new device, cleared session) they become indistinguishable from the
   attacker under §2.2's own rule, and the design has no defined branch for them. This
   is the seam between Security (don't let others supersede), Systems (exactly-one-live
-  invariant), and Product (lost-tab resend must work) — each assumes another resolved
+  invariant), and Product (lost-tab resend must work), each assumes another resolved
   it. The 10-minute expiry minus the "short window" is the live gap.
 - Suggested resolution: Define the non-originating-session re-request explicitly.
   Options: treat a re-request as superseding only when accompanied by a fresh
@@ -92,9 +92,9 @@ None. The round-002 BLOCKER is genuinely closed, not merely renamed.
 
 ## ADVISORY
 
-### §1 — Acceptance bar is now real, but the abandon condition covers only one of four criteria
+### §1: Acceptance bar is now real, but the abandon condition covers only one of four criteria
 - Problem: The success criteria are genuine and measurable (time-to-logged-in,
-  completion rate, delivery SLA, lockout/support rate) — this closes my round-002
+  completion rate, delivery SLA, lockout/support rate), this closes my round-002
   FINDING. But the stated **abandon condition** triggers only on completion rate
   (< 90% after delivery/resend addressed). The lockout/support-ticket rate (< 0.1%)
   is the metric most directly tied to the recovery design that dominated two review
@@ -107,12 +107,12 @@ None. The round-002 BLOCKER is genuinely closed, not merely renamed.
   (e.g., breach for N consecutive periods escalates a recovery-path review), or state
   why only completion rate gates the abandon decision.
 
-### §7.1 / §7.2 — Recovery-channel assurance is asserted equal to email, but the trust-root assumption can undercut it
+### §7.1 / §7.2: Recovery-channel assurance is asserted equal to email, but the trust-root assumption can undercut it
 - Problem: §7.2 says the recovery path is "held to the same bar as the primary path,"
   and §7.1's accepted trust root is "we do not defend against an attacker who already
   controls the user's inbox." If a permitted "second verified channel" happens to be
   reachable by an inbox-controlling attacker (e.g., a recovery email at the same
-  provider, or a forwarded/shared mailbox — which §7.1 notes "inherit this"), the
+  provider, or a forwarded/shared mailbox, which §7.1 notes "inherit this"), the
   same-bar claim and the recovery threat model both quietly degrade for that
   configuration. The doc requires "a second verified channel" but never requires it
   be *independent* of the primary email channel.
@@ -127,9 +127,9 @@ None. The round-002 BLOCKER is genuinely closed, not merely renamed.
 ## Cross-section coherence flags
 - §2.1 vs §6.1: §2.1 says over-limit requests are "accepted at the UI layer (so the
   response can't enumerate)," yet §6.1 lists "rate-limited" as a defined visible
-  state. These are reconciled in practice — §6.1's visible artifact is a
+  state. These are reconciled in practice, §6.1's visible artifact is a
   *non-enumerating hint* ("check spam before re-requesting"), not a hard
-  "you are rate-limited" — but a reader can take §6.1's bare label "rate-limited" as
+  "you are rate-limited", but a reader can take §6.1's bare label "rate-limited" as
   a confirmable state that would re-open the enumeration channel §4.0 closes. Worth
   one clause making explicit that the §6.1 rate-limited state renders as the
   non-enumerating hint, never as a throttle confirmation.
@@ -138,19 +138,19 @@ None. The round-002 BLOCKER is genuinely closed, not merely renamed.
   GET only presents, so a preview-fetcher cannot consume. Confirmed by reading §6.0
   against §3.2, not assumed.
 - §1 vs §7.2: the round-002 "fewer moving parts vs needs a second channel" tension is
-  now reconciled — §1 scopes the design to low-assurance consumer sign-in and frames
+  now reconciled, §1 scopes the design to low-assurance consumer sign-in and frames
   the recovery channel as the owned cost of recoverability rather than a contradiction.
   Closed.
 
 ## Summary
 v0.3 genuinely closes my round-002 BLOCKER: recovery is now mandatory-at-creation
 (not conditional), threat-modeled, rate-limited, session-rotating, and held to the
-primary-path bar — I tried to re-open the by-omission lockout against the specific
+primary-path bar, I tried to re-open the by-omission lockout against the specific
 text and could not. Success criteria are now real and measurable. What remains is not
 the old ship-stopper: one FINDING that the lockout fix's load-bearing invariant is
 enforced inside an explicitly out-of-scope process (and silent on legacy accounts),
 and one FINDING that §2.2/§3.2/§5.0 don't compose for the lost-tab/new-session
-re-request — a logic seam that either violates the single-live-token invariant or
+re-request, a logic seam that either violates the single-live-token invariant or
 strands a legitimate user. Both are FINDINGs, not BLOCKERs; with two open FINDINGs the
-objection surface is not yet at zero, so **another round is warranted** — but it is a
+objection surface is not yet at zero, so **another round is warranted**: but it is a
 narrow one, and I expect convergence next round if these two seams are closed.

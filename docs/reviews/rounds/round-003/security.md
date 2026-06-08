@@ -1,8 +1,8 @@
-# Security Adversary — Round 003
+# Security Adversary: Round 003
 
 Fresh full read of magic-link-auth.md v0.3. Re-derived from the recovery path and
 enumeration/timing first, then interception and the consume mechanism, then the
-token/session core last — not from the changelog.
+token/session core last, not from the changelog.
 
 ## BLOCKER
 
@@ -36,27 +36,27 @@ None.
 
 Re-derived each round-002 FINDING and confirmed closure in v0.3 text:
 
-- Timing parity (§4.0): now produced by a *mechanism* — all account-dependent work
-  (mint, supersession, send-enqueue) is async off the request path — not merely asserted.
+- Timing parity (§4.0): now produced by a *mechanism*, all account-dependent work
+  (mint, supersession, send-enqueue) is async off the request path, not merely asserted.
 - Targeted login-denial (§2.2): supersession is scoped to the originating session, so a
   third party cannot kill a victim's delivered link or burn their budget.
 - Delivery (§5.0): bounded rate-limited queue, async workers, classified bounces, bounded
   retry, dead-letter into §8.
 - Scanner pre-fetch (§6.0): consume is a POST behind a deliberate gesture; GET only
   presents; the §8.1 `send-failures` counter is no longer dormant.
-- Token-lookup timing (§3.1): hash-only persistence with index equality as the compare —
+- Token-lookup timing (§3.1): hash-only persistence with index equality as the compare, 
   no application-level plaintext compare, so no app-level timing channel.
 - Clock authority (§3.3): single datastore clock stamps and checks; the self-contradictory
   v0.2 ±60 s grace is removed, so there is no skew/grace window to exploit.
 
 ## ADVISORY
 
-### §7.2 — Recovery rotates the actor's session but does not state it terminates *other* live sessions
+### §7.2: Recovery rotates the actor's session but does not state it terminates *other* live sessions
 - Problem: §7.2 says a successful recovery "rotates the session and invalidates all live
   login tokens." That covers the recovering actor's own session and all outstanding
   *tokens*, but it does not explicitly say it terminates *other already-established
-  sessions*. Against the §7.1 "shared/public-device attacker" — who may already hold a
-  live session, not just a token — a legitimate recovery would rotate the victim's new
+  sessions*. Against the §7.1 "shared/public-device attacker", who may already hold a
+  live session, not just a token, a legitimate recovery would rotate the victim's new
   session yet leave the attacker's pre-existing session live.
 - Why it matters: recovery is the user's "kick everyone out and take back the account"
   lever; if it only kills tokens and the actor's own session, an attacker who already
@@ -66,7 +66,7 @@ Re-derived each round-002 FINDING and confirmed closure in v0.3 text:
   live sessions for the account**," consistent with the existing session-rotation
   primitive in §3.4.
 
-### §4.0 — The account-existence check itself is not explicitly placed off the synchronous path
+### §4.0: The account-existence check itself is not explicitly placed off the synchronous path
 - Problem: §4.0 argues timing parity because "all account-dependent work (token mint,
   §2.2 supersession, send enqueue) happens asynchronously off the request path." Deciding
   whether to do that work still requires an account-existence lookup. The spec lists the
@@ -77,8 +77,8 @@ Re-derived each round-002 FINDING and confirmed closure in v0.3 text:
   timing channel could re-enumerate accounts despite the uniform message. The current
   wording is in the right spirit but leaves this implicit.
 - Suggested resolution: state in §4.0 that the synchronous handler performs *no*
-  account-dependent branching — the existence lookup and all downstream work occur on the
-  async path — so the synchronous response is constant-time by construction, not just
+  account-dependent branching, the existence lookup and all downstream work occur on the
+  async path, so the synchronous response is constant-time by construction, not just
   constant-message.
 
 ## Cross-section coherence flags
@@ -96,7 +96,7 @@ re-deriving against the current text rather than the changelog: recovery is now 
 rate-limited, identity-evidenced, and token-invalidating (§7.2); the single-live-token
 invariant has a real `superseded` state with same-row CAS serialization (§2.2/§3.2); and
 the error-state response §3.2 depends on now exists (§6.1). The two residuals are genuine
-but deferrable — recovery doesn't explicitly kill *other* live sessions (§7.2), and §4.0
-places the work but not the existence *check* off the synchronous path — both advisory.
+but deferrable, recovery doesn't explicitly kill *other* live sessions (§7.2), and §4.0
+places the work but not the existence *check* off the synchronous path, both advisory.
 I have no BLOCKER or FINDING to add; from the security lens this document has converged
 and another security round is **not** warranted.

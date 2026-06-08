@@ -21,7 +21,7 @@ Run one reductive-review round against $ARGUMENTS using the frozen panel in
      it and decide explicitly whether to fix or defer.
    - List the **exact document revisions required**.
    - State explicitly whether the panel has **converged** (0 BLOCKER, 0 FINDING, and
-     every critic reports nothing material to add — a lone ADVISORY does not block
+     every critic reports nothing material to add, a lone ADVISORY does not block
      convergence).
 5. If not converged: revise the document per the round's decisions, **bump its
    version with a changelog entry**, and run another round.

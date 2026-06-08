@@ -1,13 +1,13 @@
-# Run Log — the descent, with the meter running
+# Run Log: the descent, with the meter running
 
-This is the audit trail for *how* the review history in `rounds/` was produced — not
+This is the audit trail for *how* the review history in `rounds/` was produced, not
 just the findings, but the time and tokens each critic spent. The point of reductive
 review is that the whole process is inspectable; that includes the cost.
 
 **Methodology.** Each round spawned the four critics in **parallel** as independent
 subagents. Each got its standing brief (`prompts/`), the protocol (`README.md`), the
 document at its current version, and round-specific instructions (fresh read, output
-path) — but **no target counts** and no sight of the other critics' output. From round 2
+path), but **no target counts** and no sight of the other critics' output. From round 2
 on, each critic's checklist order was **perturbed** (round 1 is the un-perturbed
 baseline) to defeat pattern-matching. Between rounds, an arbiter (the orchestrating
 session) de-duplicated and adjudicated the findings, then revised the document. The
@@ -15,7 +15,7 @@ critics did a fresh full read each round and were required to *prove* prior clos
 against the text rather than trust the changelog.
 
 **What the numbers are.** Duration and token figures below are what the harness
-reported per **critic subagent** — its wall-clock, and the token count the harness
+reported per **critic subagent**: its wall-clock, and the token count the harness
 attributes to that subagent (reported as `subagent_tokens`; treat it as the subagent's
 own token usage, not the round's total). They do **not** include the arbiter's
 de-duplication, adjudication, and document-revision work between rounds, which is
@@ -75,14 +75,14 @@ panel (which is why the raw column sums higher than the arbitrated counts above)
 
 ## Reading the run
 
-- **Round 3 is the standout** — the most expensive of all six (~376 s of cumulative
+- **Round 3 is the standout**: the most expensive of all six (~376 s of cumulative
   critic compute, ~99.5k tokens), with rounds 2 and 4 close behind. That's the descent
   working: those are the rounds where Systems and the Skeptic re-derived the deepest
   concurrency and recovery arguments (the 126 s / 28k-token Systems run in round 3 is the
   supersession-vs-invariant contradiction being worked out). The hardest rounds are the
   most valuable, not the cheapest.
 - **Round 6 used the least cumulative compute** (~205 s across the four critics; round 1
-  is close behind, and is actually the shortest by parallel wall-clock) — not because the
+  is close behind, and is actually the shortest by parallel wall-clock), not because the
   panel coasted, but because there was genuinely little left to refute. Each critic still
   re-derived its prior closures (see the round files) before signing off.
 - The raw-vs-arbitrated gap (e.g. round 1's raw 10/15/10 → arbitrated 3/11/4) is the

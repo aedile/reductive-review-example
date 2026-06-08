@@ -85,5 +85,5 @@ if [ "$tools" != "${stated_tools:-x}" ]; then note "  FAIL tool-call total: tabl
 [ $fail -eq 0 ] && note "  ok (runs=$runs, tool-calls=$tools recomputed == stated)"
 
 echo
-if [ $fail -eq 0 ]; then echo "CONSISTENT — the trail reconciles."; else echo "INCONSISTENT — see FAILs above."; fi
+if [ $fail -eq 0 ]; then echo "CONSISTENT, the trail reconciles."; else echo "INCONSISTENT, see FAILs above."; fi
 exit $fail

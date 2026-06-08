@@ -1,4 +1,4 @@
-# Round 4 — Product / UX critic
+# Round 4: Product / UX critic
 
 Reviewing `docs/design/magic-link-auth.md` v0.4. Fresh full read, in the perturbed
 order: positive success landing (§6.0) → the multiple-valid-links user mental model
@@ -25,7 +25,7 @@ New-this-version surface stressed (the "up to 5 concurrent links" model, §2.2/�
 
 - A user who doesn't see the first email and re-requests from a fresh session now
   accumulates **multiple simultaneously-valid emails** in one inbox. The key UX
-  question — "which link do I click, and do the older ones still work?" — resolves
+  question, "which link do I click, and do the older ones still work?", resolves
   cleanly: every live link is independently single-use (§3.2), so **any** of them
   works and there is no wrong choice among live links; clicking a stale/expired one
   routes to the §6.1 "expired → send me a new link" recovery state. The model is
@@ -56,7 +56,7 @@ a user-facing dead-end._
 
 ## ADVISORY
 
-### §5.0 / §5.1 — "You may receive more than one email" expectation is not set for the multi-link cohort
+### §5.0 / §5.1: "You may receive more than one email" expectation is not set for the multi-link cohort
 - Problem: §2.2 now permits up to 5 concurrently-valid links per account, and §5.0's
   resend "mints an additional token … it never invalidates a prior link." A user who
   re-requests from a fresh session (the exact path §2.2 is designed to serve) will
@@ -66,13 +66,13 @@ a user-facing dead-end._
   copy ("usually within a minute; check spam/promotions") sets a *latency*
   expectation but not a *multiplicity* expectation.
 - Why it matters: Multiple identical-looking auth emails is a known phishing/anxiety
-  trigger ("why did I get three of these — is someone attacking my account?") and can
+  trigger ("why did I get three of these, is someone attacking my account?") and can
   drive needless support contacts, working against the §1 "lockout/support-ticket
   rate < 0.1%" bar. It is an ADVISORY, not a FINDING, because no path actually fails:
   any link works and a stale one degrades gracefully to §6.1. It is purely an
   expectation-setting / reassurance gap.
 - Suggested resolution: One clause in the §5.0 confirmation surface and/or §5.1 email
-  trust block — e.g. "If you requested more than once, you may see more than one
+  trust block, e.g. "If you requested more than once, you may see more than one
   email; any of the links will work, and using one won't break the others." This also
   reinforces the §5.1 "if this wasn't you, ignore" trust posture for the duplicate
   case.
@@ -84,7 +84,7 @@ a user-facing dead-end._
 - §6.0 success landing ("the page they originally tried to reach, or a default home")
   is consistent with the cross-device split in the same section (confirming device
   gets the session; a different requesting device shows "signed in on another device
-  — you can close this tab"). The happy path and the cross-device path no longer
+you can close this tab"). The happy path and the cross-device path no longer
   leave any device-state undefined.
 - §2.2 (no invalidation, ≤5 independent single-use tokens), §3.2 (consuming/expiring
   one has no effect on others), §5.0 (resend "never invalidates a prior link"), and
@@ -96,7 +96,7 @@ a user-facing dead-end._
   the §6.1 rate-limited hint is still explicitly non-enumerating, so the failure
   surface does not re-open the §4.0 enumeration channel.
 - §7.2's in-scope first-sign-in enrolment prompt ("before a session is established")
-  is consistent with §1's "account creation … out of scope" framing — the boundary
+  is consistent with §1's "account creation … out of scope" framing, the boundary
   is now drawn with the legacy cohort owned on the in-scope side rather than dropped.
 - No contradictions found between the UX sections and the security/systems sections
   on this read.
@@ -107,7 +107,7 @@ v0.4 resolves both carried-forward Product/UX ADVISORYs against concrete, locata
 text: §6.0 now states the positive success landing (deep-link target with default
 fallback), and §7.2 now owns the legacy/no-recovery cohort as a named, in-flow
 enrolment class rather than a silent scope-boundary gap. The new §2.2 "up to 5
-concurrent links" model is, from a UX standpoint, a net improvement — it removes
+concurrent links" model is, from a UX standpoint, a net improvement, it removes
 v0.3's "your link was killed" supersession surprise and creates no user-facing
 dead-end, since every live link works and a stale one degrades cleanly to the §6.1
 expired state. The only residual item is one deferrable copy ADVISORY (set the

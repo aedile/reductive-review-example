@@ -1,10 +1,10 @@
-# CLAUDE.md — how to work in this repo
+# CLAUDE.md: how to work in this repo
 
 This repository demonstrates **reductive review**. The protocol of record is
 [`docs/reviews/README.md`](docs/reviews/README.md); read it before doing review work.
 
 - The document under review lives in `docs/design/`. It is fictional and
-  intentionally flawed — a teaching artifact, never to be presented as sound.
+  intentionally flawed, a teaching artifact, never to be presented as sound.
 - Improve documents only through the reductive loop: panel → graded findings →
   arbiter → versioned revision → repeat to convergence. Never hand-edit the target
   doc outside a round's recorded decisions.

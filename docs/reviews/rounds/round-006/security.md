@@ -1,11 +1,11 @@
-# Security Adversary — Round 006 (target: magic-link-auth.md v0.6)
+# Security Adversary: Round 006 (target: magic-link-auth.md v0.6)
 
 Fresh full read of v0.6, end to end, not a delta skim. Per the round-006
 perturbation I started from the §7.2 recovery step ordering (revoke-then-terminate)
 and re-derived whether the reorder closes the round-005 race (F19) cleanly, then
 worked back out to enumeration/timing and the token core. I also re-verified the
-other v0.6 edits — the split §6.1 error-state copy (F20) and the small §8/§5
-clauses — for newly introduced issues, rather than trusting the changelog.
+other v0.6 edits, the split §6.1 error-state copy (F20) and the small §8/§5
+clauses, for newly introduced issues, rather than trusting the changelog.
 
 ## BLOCKER
 
@@ -17,12 +17,12 @@ None.
 
 ## ADVISORY
 
-### §7.2/§3.2 — Revoke-then-terminate closes the round-005 gap; the residual rests on consume being a single visible unit
+### §7.2/§3.2: Revoke-then-terminate closes the round-005 gap; the residual rests on consume being a single visible unit
 - Problem: The reorder is correct. Step (1) revokes every `issued` row via the
   account-scoped index on the primary, each transition contending with consume on
   that one row; step (2) then sweeps other sessions and rotates. The safety argument
   holds **on the premise that a consume which wins its CAS makes its minted session
-  durably visible as part of the same consume unit** — i.e., there is a happens-before
+  durably visible as part of the same consume unit**, i.e., there is a happens-before
   from "consume wins CAS" to "session exists," and step (1) fully completes before
   step (2) begins. Under those two premises the only sessions extant when the sweep
   enumerates are from consumes that won *before* their row was revoked (hence before
@@ -30,18 +30,18 @@ None.
   *new* consume can win after revoke-completion because every row is already `revoked`.
   §3.2 already frames consume as "a single atomic compare-and-set ... Only the consume
   winner mints a session," which supplies the first premise, and §7.2's "in this order"
-  plus "then" supplies the second. So this is closed — but the closure is load-bearing
+  plus "then" supplies the second. So this is closed, but the closure is load-bearing
   on those two premises, not on the prose alone.
 - Why it matters: If a future edit ever decoupled session-mint from the consume CAS
   (e.g., enqueued session creation asynchronously after the CAS), a session could
   become visible *after* the sweep enumerates yet from a consume that won *before*
-  revoke-completion — re-opening exactly the F19 gap the reorder just closed. As
+  revoke-completion, re-opening exactly the F19 gap the reorder just closed. As
   written, v0.6 does not do this.
 - Suggested resolution: None required for v0.6. Optionally note in §3.2 that
   session-mint is synchronous-with / part of the winning CAS unit (not a deferred
   step), to fence the future edit that would re-open F19.
 
-### §3.1/§7.2 — `revoked` remains reachable only through the full recovery-authorization gate (guardrail, carried)
+### §3.1/§7.2: `revoked` remains reachable only through the full recovery-authorization gate (guardrail, carried)
 - Problem: Carried from round-005. The account-scoped index makes bulk-`revoke` a
   cheap, account-wide primitive; v0.6 keeps its only trigger bound to "a successful
   recovery," and recovery initiation/verification are rate-limited and locked out
@@ -67,12 +67,12 @@ None.
   `already used` ("a token *this user consumed*") from a distinct `revoked by recovery`
   state with its own neutral copy ("links from before your recent account recovery no
   longer work"), explicitly never labelled "used." All §6.1 states are only reachable
-  *after* a valid token is presented — which already implies the account exists — so
+  *after* a valid token is presented, which already implies the account exists, so
   the split discloses nothing across the §4.0 existence boundary. The one
   enumeration-sensitive state, `rate-limited`, is still rendered only as a
   non-confirming hint, so §4.0 parity is intact. §6.1 remains the exact set §3.2 refers
   to ("the defined response in §6.1"); no dangling reference.
-- **A25–A28 folded cleanly:** revoke on the primary (§7.2); `revoked` reap TTL = 7 days
+- **A25-A28 folded cleanly:** revoke on the primary (§7.2); `revoked` reap TTL = 7 days
   alongside consumed=7d/expired=24h, with `terminal_at` defined for revoked (§8.2);
   clock-offset warns at **≥ 3 s**, strictly below the §3.3 ≤ 5 s NTP bound, giving the
   gauge headroom to be a true leading indicator (§8.1); multi-email line added to the
@@ -97,5 +97,5 @@ their link was "already used," all without re-opening the §4.0 enumeration boun
 The four folded advisories (primary-side revoke, `revoked` reap TTL, ≥3 s clock-offset
 warn, multi-email confirmation copy) introduced no new attack path. The two ADVISORYs
 above are forward-looking guardrails for future edits, not open defects. Another round
-is **NOT** warranted on security grounds — I have nothing material to add; the design
+is **NOT** warranted on security grounds, I have nothing material to add; the design
 is converged for this lens.
