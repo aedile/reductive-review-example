@@ -33,7 +33,7 @@ part of this example:
   race; `revoked` mislabelled "already used").
 - **R005→R006:** v0.6's surgical fixes closed both and introduced nothing.
 
-Five of the six rounds saw a fix create the next round's headline issue. A one-shot
+Four of the six rounds saw a fix create the next round's headline issue. A one-shot
 review — or a descent that stopped at the first "looks better" — would have shipped
 one of those regressions. The loop is what caught them.
 

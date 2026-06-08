@@ -72,12 +72,15 @@ panel (which is why the raw column sums higher than the arbitrated counts above)
 
 ## Reading the run
 
-- **Rounds 3 and 5 are the slow/expensive ones**, and that's the descent working: those
-  are the rounds where Systems and the Skeptic re-derived deep concurrency and recovery
-  arguments (the 126 s / 28k-token Systems run in round 3 is the supersession-vs-invariant
-  contradiction being worked out). Cheap rounds are not better rounds.
-- **Round 6 is the fastest** — not because the panel coasted, but because there was
-  genuinely little left to refute; each critic still re-derived its prior closures (see
-  the round files) before signing off.
+- **Round 3 is the standout** — the most expensive of all six (~376 s of cumulative
+  critic compute, ~99.5k tokens), with rounds 2 and 4 close behind. That's the descent
+  working: those are the rounds where Systems and the Skeptic re-derived the deepest
+  concurrency and recovery arguments (the 126 s / 28k-token Systems run in round 3 is the
+  supersession-vs-invariant contradiction being worked out). The hardest rounds are the
+  most valuable, not the cheapest.
+- **Round 6 used the least cumulative compute** (~205 s across the four critics; round 1
+  is close behind, and is actually the shortest by parallel wall-clock) — not because the
+  panel coasted, but because there was genuinely little left to refute. Each critic still
+  re-derived its prior closures (see the round files) before signing off.
 - The raw-vs-arbitrated gap (e.g. round 1's raw 10/15/10 → arbitrated 3/11/4) is the
   arbiter's de-duplication and severity adjudication, recorded in each `round-NNN.md`.

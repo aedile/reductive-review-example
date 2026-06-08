@@ -9,7 +9,7 @@ Companion to the article in [`docs/blog/reductive-descent.md`](docs/blog/reducti
 The document under review — a passwordless "magic link" login spec — is
 **fictional and deliberately imperfect**. It exists to be torn apart so you can
 watch the technique work. Read the rounds in order and watch the objection count
-fall — not smoothly: in five of the six rounds a fix introduced a *new* problem the
+fall — not smoothly: in four of the six rounds a fix introduced a *new* problem the
 next round caught. That non-monotonic descent is the honest part, and the loop is
 what kept catching the regressions until the panel genuinely had nothing left.
 

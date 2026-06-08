@@ -92,13 +92,14 @@ quit, and from the outside those look identical. So guard against it deliberatel
 
 The worked example that accompanies this article was produced by actually running the
 loop, and it shows the failure mode's opposite in the wild: the panel *refused* to
-coast. It ran six rounds, and in five of them a revision that closed one round's
+coast. It ran six rounds, and in four of them a revision that closed one round's
 findings introduced a new one the next round caught — a fix to the token model that
 reopened an invariant, a recovery channel added without a threat model, a copy edit
-that mislabeled a security state. Two of the four critics converged by round four and
-then kept re-deriving rather than rubber-stamping, which is exactly what let the other
-two keep surfacing regressions until round six. A panel that had agreed to agree would
-have shipped one of those regressions.
+that mislabeled a security state. Three of the four critics reported zero blockers and
+findings by round four and then kept re-deriving their prior closures instead of
+coasting — which is exactly the posture that let the panel keep catching the
+regressions those cleanup edits introduced, right through round five. A panel that had
+agreed to agree would have shipped one of them.
 
 ## How this differs from the "Ralph Wiggum" loop
 
