@@ -125,3 +125,8 @@ correctness. For higher assurance, diversify the *intelligences*, not just the
 prompts: use different model families per lens, put a human on the arbiter seat (the
 role where shared blind spots do the most damage), or have the author and the critics
 be different models. The protocol is the same; only the cast changes.
+
+This is the short version. The long version — local minima, Goodhart, unobservable
+recall, consensus-isn't-truth, and which of those are *grounded* vs. *just plausible*
+— is in [`FAILURE-MODES.md`](FAILURE-MODES.md), sorted into what the evidence supports
+and what is honest intuition.

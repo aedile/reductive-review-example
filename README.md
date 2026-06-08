@@ -40,6 +40,9 @@ document; you're subtracting from the pile of things still wrong with it.
   at [`round-001.md`](docs/reviews/rounds/round-001.md).
 - [`docs/reviews/RUN-LOG.md`](docs/reviews/RUN-LOG.md) — the meter: per-critic
   duration, tokens, and tool calls for all 24 agent runs. How long it took, what it cost.
+- [`docs/reviews/FAILURE-MODES.md`](docs/reviews/FAILURE-MODES.md) — where the descent
+  lies to you (local minima, Goodhart, unobservable recall, consensus≠truth), sorted
+  into what's grounded vs. what's just plausible.
 - [`.claude/agents/`](.claude/agents/) + [`.claude/commands/`](.claude/commands/) —
   wiring to run a round in one command.
 - [`scripts/check-consistency.sh`](scripts/check-consistency.sh) — audits the trail's
