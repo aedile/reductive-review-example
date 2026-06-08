@@ -101,6 +101,14 @@ coasting — which is exactly the posture that let the panel keep catching the
 regressions those cleanup edits introduced, right through round five. A panel that had
 agreed to agree would have shipped one of them.
 
+One caveat, stated plainly because you'll think it anyway: in that example the critics,
+the arbiter, and the author who wrote each revision are all the same model in different
+roles. That diversifies *perspective* and separates *concerns*, but it is not four
+independent minds — one model's blind spots are shared across all the hats it wears. The
+loop is a strong forcing function against carelessness, not a correctness guarantee. For
+higher assurance, diversify the intelligences too: different model families per lens, or
+a human on the arbiter seat where shared blind spots do the most damage.
+
 ## How this differs from the "Ralph Wiggum" loop
 
 You've probably seen the opposite approach, sometimes called the **"Ralph Wiggum"

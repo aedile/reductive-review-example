@@ -105,3 +105,23 @@ edge cases returns "looks good, no notes." Defend against it every round:
 - **Don't let "advisory" mean "ignore."** Re-grading a finding down to advisory is
   legitimate, but the arbiter records it and decides explicitly whether to fix or
   defer — softening severity is not the same as resolving the issue.
+
+## The honest limitation: one model wearing many hats
+
+In the worked example in this repo, the four critics, the arbiter, **and the author
+who wrote every document revision are all the same model**, just prompted into
+different roles. Be clear-eyed about what that does and doesn't buy you:
+
+- It **does** give you a separation of *concerns* and diverse *perspectives* — the
+  security lens and the product lens genuinely surface different findings, as the
+  round files show.
+- It **does not** give you independent *intelligences*. Four instances of one model
+  share its blind spots: a misconception baked into the model is one the whole panel
+  can inherit, and the arbiter — same model — may not catch it either. "Independent
+  critics" here means independent *prompts and contexts*, not independent minds.
+
+So the loop is a strong forcing function against carelessness, not a guarantee of
+correctness. For higher assurance, diversify the *intelligences*, not just the
+prompts: use different model families per lens, put a human on the arbiter seat (the
+role where shared blind spots do the most damage), or have the author and the critics
+be different models. The protocol is the same; only the cast changes.
