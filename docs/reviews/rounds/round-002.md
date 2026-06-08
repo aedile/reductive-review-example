@@ -19,7 +19,7 @@
 
 The headline is **not** "3 → 0 blockers." It is "3 original blockers closed, 3 new
 ones opened by the fixes." This is the descent behaving honestly: a revision can add
-surface. Raw panel output was 5 BLOCKER / 13 FINDING / 8 ADVISORY before merge.
+surface. Raw panel output was 5 BLOCKER / 12 FINDING / 8 ADVISORY before merge.
 
 ## Re-derived confirmations (round-001 BLOCKERs — checked, not assumed)
 

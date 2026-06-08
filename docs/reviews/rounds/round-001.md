@@ -13,7 +13,7 @@
 | FINDING  | 11 |
 | ADVISORY | 4 |
 
-Raw, the panel returned 10 BLOCKER / 16 FINDING / 10 ADVISORY across four files —
+Raw, the panel returned 10 BLOCKER / 15 FINDING / 10 ADVISORY across four files —
 heavily overlapping, and with genuine disagreement on severity. The arbiter's job
 this round is mostly **adjudication**, recorded below.
 

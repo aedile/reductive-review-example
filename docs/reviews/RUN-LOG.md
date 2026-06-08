@@ -48,10 +48,10 @@ panel (which is why the raw column sums higher than the arbitrated counts above)
 | 001 | Security Adversary  | 55.5 s | 14,222 | 4 | 3 / 3 / 3 |
 | 001 | Systems Engineer    | 52.0 s | 14,217 | 4 | 2 / 5 / 2 |
 | 001 | Product / UX        | 62.5 s | 14,758 | 4 | 3 / 3 / 2 |
-| 001 | Skeptical Generalist| 65.2 s | 14,900 | 4 | 2 / 5 / 3 |
+| 001 | Skeptical Generalist| 65.2 s | 14,900 | 4 | 2 / 4 / 3 |
 | 002 | Security Adversary  | 86.0 s | 22,053 | 6 | 1 / 2 / 2 |
 | 002 | Systems Engineer    | 90.8 s | 21,745 | 6 | 1 / 3 / 2 |
-| 002 | Product / UX        | 79.7 s | 17,624 | 4 | 2 / 5 / 2 |
+| 002 | Product / UX        | 79.7 s | 17,624 | 4 | 2 / 4 / 2 |
 | 002 | Skeptical Generalist| 75.1 s | 21,280 | 6 | 1 / 3 / 2 |
 | 003 | Security Adversary  | 65.1 s | 19,247 | 4 | 0 / 0 / 2 |
 | 003 | Systems Engineer    | 125.9 s| 28,280 | 7 | 1 / 2 / 2 |
@@ -79,5 +79,5 @@ panel (which is why the raw column sums higher than the arbitrated counts above)
 - **Round 6 is the fastest** — not because the panel coasted, but because there was
   genuinely little left to refute; each critic still re-derived its prior closures (see
   the round files) before signing off.
-- The raw-vs-arbitrated gap (e.g. round 1's raw 10/16/10 → arbitrated 3/11/4) is the
+- The raw-vs-arbitrated gap (e.g. round 1's raw 10/15/10 → arbitrated 3/11/4) is the
   arbiter's de-duplication and severity adjudication, recorded in each `round-NNN.md`.

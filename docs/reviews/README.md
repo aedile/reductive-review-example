@@ -79,9 +79,14 @@ FINDING or BLOCKER does.
 The process is meant to be audited end to end, not just trusted. Every critic's raw
 output is kept in `rounds/round-NNN/`, every arbiter decision in `rounds/round-NNN.md`,
 and the **timing and token cost of every agent run** in
-[`RUN-LOG.md`](RUN-LOG.md). Keep it that way: never run the loop on content you can't
-publish, and when you can, publish the whole trail — the slow rounds and the regressions
-included. (Secret or internal documents are exactly what *not* to run this on in public.)
+[`RUN-LOG.md`](RUN-LOG.md). And because counted findings are only as trustworthy as
+their bookkeeping, [`scripts/check-consistency.sh`](../../scripts/check-consistency.sh)
+audits the trail itself — every per-critic count in the RUN-LOG against the actual
+graded entries, the README's descent table against each round's aggregate, and every
+§-citation against the design doc. Run it after any edit. Keep it that way: never run
+the loop on content you can't publish, and when you can, publish the whole trail — the
+slow rounds and the regressions included. (Secret or internal documents are exactly what
+*not* to run this on in public.)
 
 ## Anti-rubber-stamp guards (do not skip)
 
